@@ -362,6 +362,7 @@
     isQuantizedSwatch: isQuantizedSwatch,
     normalizeManifest: normalizeManifest,
     createCatalogClient: createCatalogClient,
+    debounce: debounce,
     displayBrand: disp,
     sameBrand: sameBrand,
     paintHref: paintHref,
@@ -395,12 +396,20 @@
   }
 
   function debounce(fn, delay) {
-    var timer;
-    return function () {
+    var timer = null;
+    function debounced() {
       var args = arguments, self = this;
       global.clearTimeout(timer);
-      timer = global.setTimeout(function () { fn.apply(self, args); }, delay);
+      timer = global.setTimeout(function () {
+        timer = null;
+        fn.apply(self, args);
+      }, delay);
+    }
+    debounced.cancel = function () {
+      global.clearTimeout(timer);
+      timer = null;
     };
+    return debounced;
   }
 
   function formatDate(iso) {
@@ -674,11 +683,13 @@
     input.addEventListener("keydown", function (event) {
       if (event.key === "Escape") {
         event.preventDefault();
+        runSearch.cancel();
         searchGeneration += 1;
         closeDrop();
         return;
       }
       if (event.key === "Tab") {
+        runSearch.cancel();
         searchGeneration += 1;
         closeDrop();
         return;
@@ -713,6 +724,7 @@
 
     document.addEventListener("click", function (event) {
       if (!root.contains(event.target)) {
+        runSearch.cancel();
         searchGeneration += 1;
         closeDrop();
       }
