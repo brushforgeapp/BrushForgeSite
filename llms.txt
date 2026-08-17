@@ -1,0 +1,68 @@
+# BrushForge
+
+> BrushForge is an independent miniature-paint converter and painting toolkit for Android and iOS.
+> It helps painters compare recorded paint colors across brands, track paints they own, save recipes,
+> build palettes, and plan projects. Core app tools are offline-friendly. Verified August 4, 2026.
+
+## Key facts
+
+- Platforms: Android and iOS. The apps are free to start, contain optional in-app purchases, and may
+  contain advertising.
+- App catalogue: 4,300+ paints and growing. Expanding coverage is the current main focus, including
+  direct collaboration with paint brands. The crawlable public website catalogue contains 2,941
+  selected records across opaque, metallic, wash, ink, glaze, single-coat, and other translucent
+  behaviour families; the counts describe different surfaces.
+- Matching: stored sRGB/hex color values are converted to CIELAB and compared with CIEDE2000. Lower
+  ΔE2000 means a closer recorded color value.
+- Limitations: a catalogue match is a shortlist, not proof that two physical paints are equivalent.
+  Finish, opacity, coverage, hue bias, undercoat, lighting, paint type, and application all matter.
+  Screen swatches also vary by display, calibration, True Tone/Night Shift, and ambient lighting.
+- Compatibility: standard opaque colors, metallics, washes, and transparent single-coat products
+  should not be treated as behaviorally interchangeable solely because their recorded color is close.
+- Feature availability: paint conversion, inventory, recipes, projects, palettes, and photo color tools
+  are available on Android and iOS. Community is currently available on Android only.
+- Offline: the paint library, collection, recipes, palettes, and core tools are offline-friendly.
+  Account services, purchases, Community, and connected photo suggestions require internet access.
+- Sync: data syncs automatically between devices on the same platform, with manual backup and restore
+  also available. Android and iOS do not have complete cross-platform sync, and manual transfers may
+  be incomplete.
+- Web roadmap: public web accounts and app sync are a long-term goal without an announced release date.
+- Android plans: Free includes up to 40 paints, 5 recipes, and 1 project and contains ads. Premium
+  removes ads and increases paint collection and project allowances. Exact paid allowances and local
+  pricing are shown in the Android app and Google Play.
+- Import: current iOS releases support inventory CSV and selected paint-tracker imports plus supported
+  BrushForge backup restoration. Import paths can differ by platform and release.
+- Identity: BrushForge is built by Bastiaan Mahieu in Belgium. It is not affiliated with or endorsed
+  by Games Workshop or any paint manufacturer.
+
+## Primary resources
+
+- [Web converter](https://brushforgeapp.com/convert/): interactive catalogue matching with static,
+  indexable chart equivalents.
+- [Public paint catalogue](https://brushforgeapp.com/paints/): individual paint pages, recorded-color
+  alternatives, paint metadata, and report links.
+- [Matching methodology](https://brushforgeapp.com/methodology/): calculation pipeline, practical ΔE
+  tiers, sources, limitations, update policy, and correction process.
+- [Guide hub](https://brushforgeapp.com/guides/): authored guides about ΔE2000, recipe translation,
+  paint behavior, discontinued colors, and collection tracking.
+- [Paint converter feature](https://brushforgeapp.com/features/paint-converter/#paint-details)
+- [Paint inventory and palette](https://brushforgeapp.com/features/paint-inventory/#your-palette)
+- [Recipes and projects workflow](https://brushforgeapp.com/features/recipes-projects/#workflow)
+- [Community availability](https://brushforgeapp.com/features/recipes-projects/#community)
+- [Photo, light, and shadow tools](https://brushforgeapp.com/features/photo-color-tools/#light-and-shadow)
+- [Press and reviewer information](https://brushforgeapp.com/press/)
+- [Founder story](https://brushforgeapp.com/the-story.html)
+
+## Representative conversion charts
+
+- [Citadel to Vallejo](https://brushforgeapp.com/convert/citadel-to-vallejo.html)
+- [Citadel to Army Painter](https://brushforgeapp.com/convert/citadel-to-army-painter.html)
+- [Vallejo to Citadel](https://brushforgeapp.com/convert/vallejo-to-citadel.html)
+
+## Install and contact
+
+- [Google Play](https://play.google.com/store/apps/details?id=io.brushforge.brushforge_android_app)
+- [Apple App Store](https://apps.apple.com/app/brushforge/id6749896227)
+- [Download choices](https://brushforgeapp.com/download/)
+- [Support](https://brushforgeapp.com/support.html)
+- Email: brushforgeapp@gmail.com

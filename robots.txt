@@ -1,0 +1,46 @@
+# robots.txt - brushforgeapp.com
+# Search and answer-engine crawlers may crawl public HTML. The runtime
+# catalogue projections are excluded to reduce crawl waste. These directives
+# are policy signals, not access control.
+
+# Named crawler rules
+User-agent: GPTBot
+Disallow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /assets/catalog/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /assets/catalog/
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /assets/catalog/
+
+User-agent: Claude-User
+Allow: /
+Disallow: /assets/catalog/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /assets/catalog/
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /assets/catalog/
+
+User-agent: Google-Extended
+Disallow: /
+
+# Everyone else
+User-agent: *
+Allow: /
+Disallow: /assets/catalog/
+Disallow: /tools/
+
+Sitemap: https://brushforgeapp.com/sitemap.xml

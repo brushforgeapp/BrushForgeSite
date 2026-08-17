@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">BrushForge miniature paint converter and painting toolkit</title>
+  <desc id="desc">A dark BrushForge social card with paired paint swatches and a Delta E comparison.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#050507"/>
+      <stop offset="0.62" stop-color="#11151c"/>
+      <stop offset="1" stop-color="#1b1320"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.18" cy="0.18" r="0.82">
+      <stop offset="0" stop-color="#f0c75e" stop-opacity="0.17"/>
+      <stop offset="1" stop-color="#f0c75e" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="#000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <circle cx="1060" cy="50" r="260" fill="#7a4ad8" opacity="0.07"/>
+  <circle cx="70" cy="630" r="230" fill="#f0c75e" opacity="0.04"/>
+
+  <g transform="translate(72 66)">
+    <rect width="62" height="62" rx="17" fill="#f0c75e"/>
+    <text x="31" y="42" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="800" fill="#090a0d">BF</text>
+    <text x="82" y="43" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#f8fafc">BrushForge</text>
+  </g>
+
+  <g transform="translate(72 182)">
+    <text font-family="Georgia, 'Times New Roman', serif" font-size="54" font-weight="700" fill="#ffffff">
+      <tspan x="0" y="0">Find the right paint.</tspan>
+      <tspan x="0" y="74">Keep the project together.</tspan>
+    </text>
+    <text x="0" y="190" font-family="Arial, Helvetica, sans-serif" font-size="27" fill="#c7d0dc">Compare paints across brands with ΔE2000, track what</text>
+    <text x="0" y="229" font-family="Arial, Helvetica, sans-serif" font-size="27" fill="#c7d0dc">you own, save recipes, and plan miniature projects.</text>
+    <text x="0" y="314" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#f0c75e">4,300+ paints  ·  iOS &amp; Android  ·  Works offline  ·  Free to start</text>
+  </g>
+
+  <g transform="translate(832 83)" filter="url(#shadow)">
+    <rect width="292" height="466" rx="42" fill="#171a20" stroke="#ffffff" stroke-opacity="0.13" stroke-width="2"/>
+    <rect x="104" y="14" width="84" height="7" rx="4" fill="#3f4650"/>
+    <text x="30" y="78" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#f0c75e">PAINT MATCH</text>
+    <text x="30" y="111" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#f8fafc">Recorded color</text>
+    <rect x="30" y="141" width="102" height="102" rx="24" fill="#8e2940"/>
+    <rect x="160" y="141" width="102" height="102" rx="24" fill="#952f43"/>
+    <path d="M137 192h18" stroke="#f0c75e" stroke-width="3" stroke-linecap="round"/>
+    <text x="30" y="278" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#9ba7b6">SOURCE</text>
+    <text x="160" y="278" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#9ba7b6">ALTERNATIVE</text>
+    <rect x="30" y="305" width="232" height="62" rx="16" fill="#20252d" stroke="#ffffff" stroke-opacity="0.08"/>
+    <text x="50" y="343" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#f8fafc">ΔE2000</text>
+    <text x="230" y="343" text-anchor="end" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#57d68d">2.1</text>
+    <circle cx="45" cy="405" r="7" fill="#57d68d"/>
+    <text x="62" y="411" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#d6dce5">Close color match</text>
+    <text x="30" y="444" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#8f9aa8">Screen swatches are approximate.</text>
+  </g>
+</svg>

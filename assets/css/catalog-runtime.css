@@ -1,0 +1,320 @@
+.bf-consent-panel {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  left: max(16px, env(safe-area-inset-left));
+  z-index: 110;
+  width: auto;
+  max-width: 760px;
+  margin: 0 auto;
+  color: var(--text);
+  background: rgba(12, 13, 17, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+  box-shadow: 0 20px 54px rgba(0, 0, 0, 0.62);
+  opacity: 0;
+  transform: translateY(calc(100% + 28px));
+  transition: opacity 180ms ease, transform 220ms ease;
+}
+
+.bf-consent-panel[hidden] { display: none; }
+
+.bf-consent-panel.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.has-bf-consent-panel {
+  padding-bottom: calc(var(--bf-consent-panel-clearance, 160px) + env(safe-area-inset-bottom));
+}
+
+.bf-consent-panel-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 22px;
+  align-items: center;
+  padding: 18px;
+}
+
+.bf-consent-copy h2 {
+  margin: 0 0 5px;
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.bf-consent-copy p,
+.bf-consent-status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.bf-consent-copy a {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: rgba(240, 199, 94, 0.7);
+  text-underline-offset: 3px;
+}
+
+.bf-consent-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(132px, 1fr));
+  gap: 8px;
+}
+
+.bf-consent-actions button,
+.bf-consent-close,
+.bf-analytics-settings-link {
+  min-height: 44px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.bf-consent-actions button {
+  padding: 9px 13px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.78rem;
+}
+
+.bf-consent-actions button:hover,
+.bf-consent-actions button:focus-visible {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(240, 199, 94, 0.55);
+}
+
+.bf-consent-actions button[aria-pressed="true"] {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.bf-consent-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.bf-consent-close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  color: var(--muted);
+  background: #15171c;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.bf-consent-close:hover {
+  color: #fff;
+  border-color: rgba(240, 199, 94, 0.55);
+}
+
+.bf-consent-close[hidden],
+.bf-consent-status[hidden] { display: none; }
+
+.bf-consent-status {
+  grid-column: 1 / -1;
+  color: #f4cf77;
+}
+
+.bf-analytics-settings-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  text-align: left;
+}
+
+.bf-analytics-settings-link:hover { color: #fff; }
+.bf-install-prompt { display: none; }
+
+@media (max-width: 768px) {
+  .store-link-priority { order: -1; }
+
+  body.has-bf-install-prompt {
+    padding-bottom: calc(var(--bf-install-prompt-clearance, 104px) + env(safe-area-inset-bottom));
+  }
+
+  .bf-install-prompt {
+    position: fixed;
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: max(12px, env(safe-area-inset-left));
+    z-index: 95;
+    isolation: isolate;
+    display: block;
+    width: auto;
+    max-width: 520px;
+    margin: 0 auto;
+    color: var(--text);
+    background: rgba(12, 13, 17, 0.97);
+    border: 1px solid rgba(240, 199, 94, 0.34);
+    border-radius: 14px;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.58), 0 0 22px rgba(240, 199, 94, 0.1);
+    opacity: 0;
+    transform: translateY(calc(100% + 24px));
+    transition: opacity 180ms ease, transform 220ms ease;
+  }
+
+  .bf-install-prompt[hidden] { display: none; }
+
+  .bf-install-prompt.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .bf-install-prompt-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto 44px;
+    gap: 10px;
+    align-items: center;
+    min-height: 68px;
+    padding: 10px;
+  }
+
+  .bf-install-prompt-message {
+    min-width: 0;
+    margin: 0;
+    color: #dbe3ee;
+    font-size: 0.83rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .bf-install-prompt-action,
+  .bf-install-prompt-dismiss {
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .bf-install-prompt-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    color: #050507;
+    background: var(--primary-gradient);
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    box-shadow: 0 3px 14px rgba(240, 199, 94, 0.3);
+    font-size: 0.76rem;
+    line-height: 1.15;
+    text-align: center;
+  }
+
+  .bf-install-prompt-action:hover {
+    color: #050507;
+    filter: brightness(1.08);
+  }
+
+  .bf-install-prompt-dismiss {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    font-size: 1.35rem;
+    line-height: 1;
+  }
+
+  .bf-install-prompt-dismiss:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.09);
+  }
+}
+
+@media (max-width: 680px) {
+  .bf-consent-panel {
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: max(12px, env(safe-area-inset-left));
+  }
+
+  .bf-consent-panel-inner {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .bf-consent-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .bf-consent-close {
+    top: 8px;
+    right: 8px;
+  }
+
+  .bf-consent-panel.is-settings-open .bf-consent-copy { padding-right: 40px; }
+}
+
+@media (max-width: 420px) {
+  .bf-install-prompt-inner {
+    grid-template-columns: minmax(0, 1fr) 44px;
+    gap: 8px;
+  }
+
+  .bf-install-prompt-message {
+    grid-column: 1 / -1;
+    padding: 1px 4px 0;
+  }
+
+  .bf-install-prompt-action { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bf-consent-panel,
+  .bf-install-prompt {
+    transform: none;
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .bf-consent-panel,
+  .bf-install-prompt {
+    color: CanvasText;
+    background: Canvas;
+    border: 2px solid CanvasText;
+    box-shadow: none;
+  }
+
+  .bf-consent-copy h2,
+  .bf-consent-copy p,
+  .bf-consent-status,
+  .bf-install-prompt-message { color: CanvasText; }
+
+  .bf-consent-actions button,
+  .bf-consent-close,
+  .bf-analytics-settings-link,
+  .bf-install-prompt-action,
+  .bf-install-prompt-dismiss {
+    color: ButtonText;
+    background: ButtonFace;
+    border: 2px solid ButtonText;
+    box-shadow: none;
+  }
+}
