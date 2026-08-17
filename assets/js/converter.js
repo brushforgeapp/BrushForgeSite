@@ -4,9 +4,10 @@
 (function (global) {
   "use strict";
 
+  var PUBLIC_CATALOGUE_SCHEMA_VERSION = "2";
   var MANIFEST_URLS = [
-    "/assets/catalog/manifest.json",
-    "/assets/catalog/catalog-manifest.json"
+    "/assets/catalog/manifest.json?schema=" + PUBLIC_CATALOGUE_SCHEMA_VERSION,
+    "/assets/catalog/catalog-manifest.json?schema=" + PUBLIC_CATALOGUE_SCHEMA_VERSION
   ];
   var DATA_UPDATED = "";
   var componentCount = 0;
@@ -135,6 +136,15 @@
     return Object.keys(value).every(function (key) { return allowed.indexOf(key) >= 0; });
   }
 
+  function isQuantizedSwatch(value) {
+    if (typeof value !== "string" || !/^#[0-9a-f]{6}$/i.test(value)) return false;
+    return [1, 3, 5].every(function (offset) {
+      var channel = parseInt(value.slice(offset, offset + 2), 16);
+      var level = Math.round(channel * 31 / 255);
+      return Math.round(level * 255 / 31) === channel;
+    });
+  }
+
   function isPublicPaintPath(path) {
     return typeof path === "string" && /^\/paints\/[a-z0-9][a-z0-9\/-]*\.html$/.test(path)
       && path.indexOf("..") < 0;
@@ -142,13 +152,16 @@
 
   function validateIdentity(paint) {
     if (!paint || typeof paint !== "object") return false;
-    if (!hasOnlyKeys(paint, ["key", "name", "brand", "range", "line", "code", "path", "status"])) {
+    if (!hasOnlyKeys(paint, [
+      "key", "name", "brand", "range", "line", "code", "path", "status", "swatch"
+    ])) {
       return false;
     }
-    if (["key", "name", "brand", "path", "status"].some(function (field) {
+    if (["key", "name", "brand", "path", "status", "swatch"].some(function (field) {
       return typeof paint[field] !== "string" || !paint[field];
     })) return false;
     if (!/^[A-Za-z0-9_-]{12,64}$/.test(paint.key) || !isPublicPaintPath(paint.path)) return false;
+    if (!isQuantizedSwatch(paint.swatch)) return false;
     if (!PUBLIC_STATUSES[paint.status]) return false;
     if (paint.range !== undefined && typeof paint.range !== "string") return false;
     if (paint.line !== undefined && typeof paint.line !== "string") return false;
@@ -165,7 +178,7 @@
       return typeof item[field] !== "string" || !item[field];
     })) return false;
     if (!/^[A-Za-z0-9_-]{12,64}$/.test(item.key) || !isPublicPaintPath(item.path)) return false;
-    if (!/^#[0-9a-f]{6}$/i.test(item.swatch)) return false;
+    if (!isQuantizedSwatch(item.swatch)) return false;
     if (typeof item.range !== "string") return false;
     if (item.line !== undefined && typeof item.line !== "string") return false;
     if (typeof item.code !== "string") return false;
@@ -190,7 +203,7 @@
     if (["key", "name", "brand", "path", "status", "swatch"].some(function (field) {
       return typeof source[field] !== "string" || !source[field];
     }) || !/^[A-Za-z0-9_-]{12,64}$/.test(source.key) || !isPublicPaintPath(source.path)
-        || !/^#[0-9a-f]{6}$/i.test(source.swatch) || !PUBLIC_STATUSES[source.status]
+        || !isQuantizedSwatch(source.swatch) || !PUBLIC_STATUSES[source.status]
         || typeof source.range !== "string"
         || (source.line !== undefined && typeof source.line !== "string")
         || typeof source.code !== "string") return false;
@@ -206,9 +219,11 @@
     var searchPromises = {};
     var resultPromises = {};
 
-    function request(url, label) {
+    function request(url, label, noStore) {
+      var options = { headers: { Accept: "application/json" } };
+      if (noStore) options.cache = "no-store";
       return Promise.resolve().then(function () {
-        return fetchJson(url, { headers: { Accept: "application/json" } });
+        return fetchJson(url, options);
       })
         .then(function (response) {
           if (!response || !response.ok) {
@@ -220,7 +235,7 @@
 
     function requestManifestAt(index, previousError) {
       if (index >= urls.length) return Promise.reject(previousError || new Error("Catalogue manifest was unavailable"));
-      return request(urls[index], "Catalogue manifest").catch(function (error) {
+      return request(urls[index], "Catalogue manifest", true).catch(function (error) {
         return requestManifestAt(index + 1, error);
       });
     }
@@ -248,7 +263,9 @@
     function loadSearch(value, force) {
       var bucket = searchBucket(value);
       if (!bucket) return Promise.reject(new Error("Search needs at least two letters or numbers"));
-      if (force) delete searchPromises[bucket];
+      if (force) {
+        return loadManifest(true).then(function () { return loadSearch(value, false); });
+      }
       if (!searchPromises[bucket]) {
         searchPromises[bucket] = loadManifest(false).then(function (current) {
           return request(current.searchBase + "/" + encodeURIComponent(bucket) + ".json", "Paint search");
@@ -272,7 +289,9 @@
       if (!/^[a-zA-Z0-9_-]+$/.test(publicKey)) {
         return Promise.reject(new Error("Paint result key has an unexpected format"));
       }
-      if (force) delete resultPromises[publicKey];
+      if (force) {
+        return loadManifest(true).then(function () { return loadResult(publicKey, false); });
+      }
       if (!resultPromises[publicKey]) {
         resultPromises[publicKey] = loadManifest(false).then(function (current) {
           return request(current.resultBase + "/" + encodeURIComponent(publicKey) + ".json", "Paint result");
@@ -340,6 +359,7 @@
     deScale: deScale,
     normalizeSearch: normalizeSearch,
     searchBucket: searchBucket,
+    isQuantizedSwatch: isQuantizedSwatch,
     normalizeManifest: normalizeManifest,
     createCatalogClient: createCatalogClient,
     displayBrand: disp,
@@ -561,7 +581,9 @@
       }
       hits.forEach(function (paint, index) {
         var item = element("button", "bfc-item",
-          '<span class="bfc-iname">' + esc(paint.name)
+          '<span class="bf-swatch bfc-option-swatch" style="background-color:' + esc(paint.swatch)
+          + '" aria-hidden="true"></span>'
+          + '<span class="bfc-iname">' + esc(paint.name)
           + (paint.code ? ' <span class="bfc-imeta">' + esc(paint.code) + "</span>" : "") + "</span>"
           + '<span class="bfc-imeta">' + esc(disp(paint.brand))
           + (rangeOf(paint) ? " · " + esc(rangeOf(paint)) : "")
@@ -650,6 +672,17 @@
       runSearch();
     });
     input.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        searchGeneration += 1;
+        closeDrop();
+        return;
+      }
+      if (event.key === "Tab") {
+        searchGeneration += 1;
+        closeDrop();
+        return;
+      }
       if (drop.hidden) return;
       if (event.key === "ArrowDown" || event.key === "ArrowUp") {
         event.preventDefault();
@@ -665,21 +698,24 @@
         event.preventDefault();
         setActive(dropItems.length - 1);
       } else if (event.key === "Enter") {
-        var choice = activeIndex >= 0 ? dropItems[activeIndex] : dropItems[0];
+        if (activeIndex < 0 && dropItems.length) {
+          event.preventDefault();
+          setActive(0);
+          return;
+        }
+        var choice = activeIndex >= 0 ? dropItems[activeIndex] : null;
         if (choice) {
           event.preventDefault();
           choice.click();
         }
-      } else if (event.key === "Escape") {
-        event.preventDefault();
-        closeDrop();
-      } else if (event.key === "Tab") {
-        closeDrop();
       }
     });
 
     document.addEventListener("click", function (event) {
-      if (!root.contains(event.target)) closeDrop();
+      if (!root.contains(event.target)) {
+        searchGeneration += 1;
+        closeDrop();
+      }
     });
 
     function allTargetBrands() {
