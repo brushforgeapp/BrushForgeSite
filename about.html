@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b0d10" />
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' data: https://*.google-analytics.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self' https://www.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; base-uri 'self'; form-action 'self'">
+    <title>About BrushForge</title>
+    <meta name="description"
+        content="BrushForge is a miniature paint converter and painting toolkit for comparing paints, organizing a collection, saving recipes, and planning projects." />
+    <link rel="icon" href="assets/images/logo.jpg" sizes="any">
+    <link rel="apple-touch-icon" href="assets/images/logo.jpg"><meta name="apple-itunes-app" content="app-id=6749896227, affiliate-data=pt=127902542&amp;ct=content&amp;mt=8">
+    <link rel="canonical" href="https://brushforgeapp.com/about.html" />
+    <meta property="og:title" content="About BrushForge" />
+    <meta property="og:description"
+        content="Learn how BrushForge helps miniature painters compare paints, organize a collection, save recipes, and plan projects." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://brushforgeapp.com/about.html" />
+    <meta property="og:image" content="https://brushforgeapp.com/assets/images/social-card.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="About BrushForge"><meta name="twitter:description" content="Learn how BrushForge helps miniature painters compare paints, organize a collection, save recipes, and plan projects."><meta name="twitter:image" content="https://brushforgeapp.com/assets/images/social-card.png"><meta name="twitter:image:alt" content="About BrushForge">
+
+    <link rel="stylesheet" href="assets/css/site.css" />
+    <script defer src="assets/js/site-config.js"></script>
+<script defer src="assets/js/analytics.js"></script>
+    <script defer src="assets/js/site.js"></script>
+    <style>
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .article-header {
+            padding: 100px 0 40px;
+            text-align: center;
+        }
+
+        .article-content {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: #e2e8f0;
+        }
+
+        .article-content h2 {
+            margin-top: 60px;
+            margin-bottom: 24px;
+            color: #fff;
+            font-family: var(--font-display);
+            font-size: 2rem;
+        }
+
+        .article-content h3 {
+            margin-top: 40px;
+            margin-bottom: 16px;
+            color: var(--accent);
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+        }
+
+        .article-content p {
+            margin-bottom: 24px;
+        }
+
+        .founder-card {
+            display: grid;
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+            overflow: hidden;
+            margin: 0 0 64px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            background: linear-gradient(145deg, rgba(240, 199, 94, 0.08), rgba(22, 24, 29, 0.78));
+            box-shadow: var(--shadow-soft);
+        }
+
+        .founder-media {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            min-height: 440px;
+            margin: 0;
+            background: #0b0d10;
+        }
+
+        .founder-media picture {
+            display: block;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .founder-media img {
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+            object-fit: cover;
+        }
+
+        .founder-media picture + picture {
+            border-top: 1px solid var(--border);
+        }
+
+        .founder-copy {
+            align-self: center;
+            padding: 40px;
+        }
+
+        .founder-copy .founder-eyebrow {
+            margin: 0 0 10px;
+            color: var(--accent);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .founder-copy h2 {
+            margin: 0 0 18px;
+            color: #fff;
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            line-height: 1.1;
+        }
+
+        .founder-copy p {
+            margin: 0 0 18px;
+            color: #d9e0e8;
+            font-size: 1rem;
+            line-height: 1.65;
+        }
+
+        @media (max-width: 720px) {
+            .founder-card {
+                grid-template-columns: 1fr;
+            }
+
+            .founder-media {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: none;
+                min-height: 220px;
+            }
+
+            .founder-media picture,
+            .founder-media img {
+                height: 220px;
+            }
+
+            .founder-media picture + picture {
+                border-top: 0;
+                border-left: 1px solid var(--border);
+            }
+
+            .founder-copy {
+                padding: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container nav">
+            <a href="/" class="brand">
+                <img src="/assets/images/logo.jpg" class="logo" alt="" width="32" height="32" />
+                <span>BrushForge</span>
+            </a>
+            <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false"
+                aria-controls="primary-navigation" aria-label="Open navigation">
+                <span class="nav-toggle-icon" aria-hidden="true"></span>
+            </button>
+            <nav id="primary-navigation" class="navlinks" data-nav-menu aria-label="Primary navigation">
+                <a href="/">Home</a>
+                <a href="/convert/">Converter</a>
+                <a href="/paints/">Paints</a>
+                <a href="/guides/">Guides</a>
+                <a href="/about.html" aria-current="page" style="color:var(--accent);">About</a>
+                <a href="/the-story.html" data-analytics-event="story_open"
+                    data-analytics-placement="about_header">Story</a>
+                <a href="/download/?from=about" class="btn primary" data-analytics-event="download_page_open" data-analytics-placement="shared_header" data-analytics-page-family="about">Get the App</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="article-header article-container">
+            <span class="badge"><span class="dot"></span> About the App</span>
+            <h1 class="h1">What is BrushForge?</h1>
+            <p class="p-lg" style="margin:20px auto 0;">A paint converter and painting toolkit that keeps the practical
+                parts of a project together.</p>
+        </div>
+
+        <div class="article-container">
+            <section class="founder-card" aria-labelledby="founder-title">
+                <figure class="founder-media" aria-label="A painted miniature and the desk where BrushForge is shaped">
+                    <picture>
+                        <source type="image/avif"
+                            srcset="/assets/images/Mywork-480.avif 480w, /assets/images/Mywork-800.avif 800w"
+                            sizes="(max-width: 720px) 50vw, 390px">
+                        <source type="image/webp"
+                            srcset="/assets/images/Mywork-480.webp 480w, /assets/images/Mywork-800.webp 800w"
+                            sizes="(max-width: 720px) 50vw, 390px">
+                        <img src="/assets/images/Mywork.jpg" alt="A blue miniature painted by Bas Mahieu" width="1514"
+                            height="1522" loading="lazy" decoding="async" fetchpriority="low">
+                    </picture>
+                    <picture>
+                        <source type="image/avif"
+                            srcset="/assets/images/Portrait-480.avif 480w, /assets/images/Portrait-800.avif 800w"
+                            sizes="(max-width: 720px) 50vw, 390px">
+                        <source type="image/webp"
+                            srcset="/assets/images/Portrait-480.webp 480w, /assets/images/Portrait-800.webp 800w"
+                            sizes="(max-width: 720px) 50vw, 390px">
+                        <img src="/assets/images/Portrait.jpg" alt="Bas Mahieu's miniature painting desk" width="3024"
+                            height="4032" loading="lazy" decoding="async" fetchpriority="low">
+                    </picture>
+                </figure>
+                <div class="founder-copy">
+                    <p class="founder-eyebrow">Independent app by Bas Mahieu</p>
+                    <h2 id="founder-title">Built by a miniature painter.</h2>
+                    <p>I’m Bas, a UX/UI designer, developer, and miniature painter. BrushForge started as a small tool
+                        for my own late-night painting sessions and grew into an independent iOS and Android side
+                        project.</p>
+                    <p>I still maintain the app and paint catalogue with help from painter feedback. Expanding paint
+                        coverage is the main focus right now, including direct collaboration with paint brands.</p>
+                    <a class="btn primary" href="/the-story.html" data-analytics-event="story_open"
+                        data-analytics-placement="about_founder">Read why I built BrushForge</a>
+                </div>
+            </section>
+            <div class="article-content">
+                <h2>The Mission</h2>
+                <p>Miniature painting should be about creativity, not wrestling with paint conversions across brands,
+                    trying to remember what paints you own while at the hobby shop, or losing track of the recipes you
+                    used for an army you started six months ago.</p>
+                <p>BrushForge was built to be one practical tool that handles the logistics so you can focus
+                    entirely on the brush.</p>
+
+                <h2>Core Features</h2>
+
+                <div class="grid grid-2" style="margin-top: 40px; gap: 32px;">
+                    <div class="card" style="padding: 32px;">
+                        <h3 style="margin-top:0;">Catalogue Matching</h3>
+                        <p style="font-size: 1rem; margin-bottom:0;">BrushForge uses ΔE2000 in LAB color space to compare
+                            catalogue screen colors across its 4,300+ paint app database. That catalogue is only the
+                            start: more ranges and product details are being added as the app grows. Physical finish,
+                            lighting, and application can still change how a paint appears.</p>
+                    </div>
+                    <div class="card" style="padding: 32px;">
+                        <h3 style="margin-top:0;">Complete Organization</h3>
+                        <p style="font-size: 1rem; margin-bottom:0;">Carry your entire inventory in your pocket. Track
+                            what you own, manage a shopping wishlist, log your custom mixes, and build step-by-step
+                            project plans for your miniatures.</p>
+                    </div>
+                    <div class="card" style="padding: 32px;">
+                        <h3 style="margin-top:0;">Creative Tools</h3>
+                        <p style="font-size: 1rem; margin-bottom:0;">Feeling stuck? Use our Recipe Generator to find
+                            ideas based on your existing paints, or analyze photos to pull matching color schemes
+                            directly from reference images.</p>
+                    </div>
+                    <div class="card" style="padding: 32px;">
+                        <h3 style="margin-top:0;">Offline First</h3>
+                        <p style="font-size: 1rem; margin-bottom:0;">Painting often happens in basements, at events, or
+                            in the back of hobby shops with terrible reception. Core BrushForge tools work offline, so
+                            they remain available without a connection.</p>
+                    </div>
+                </div>
+
+                <h2>Platform &amp; Pricing</h2>
+                <p style="margin-top: 40px;">BrushForge is proudly available natively on both <strong>iOS and
+                        Android</strong>.</p>
+                <p>The app is free to start with access to the converter and basic organization tools. The starting
+                    limits are 40 paints, five recipes, and one project. On Android, Premium removes ads and increases
+                    paint collection and project allowances. Exact paid allowances and local prices are shown in the
+                    current app and store listing.</p>
+                <p>Data syncs automatically between devices on the same platform, with manual backup and restore as an
+                    additional option. Android and iOS do not have complete cross-platform sync, and manual transfers
+                    between them may be incomplete. Purchases remain tied to their platform.</p>
+                <p>A long-term roadmap goal is to add web accounts and app sync so saved work can eventually be used
+                    from a browser. No release date has been announced.</p>
+                <p>Paid options directly support the solo development of BrushForge and its ongoing maintenance.</p>
+                <p>Curious about how BrushForge started? <a href="/the-story.html"
+                        data-analytics-event="story_open" data-analytics-placement="about_body"
+                        style="color:var(--accent); text-decoration:underline;">Read The Story here</a>.</p>
+
+            </div>
+        </div>
+
+        <!-- Bottom CTA -->
+        <section id="get-app" class="section cta-final">
+            <div class="container" style="text-align:center;">
+                <h2 class="h2">Ready to start painting?</h2>
+                <p class="p-lg">Compare paints and keep your painting work organized.</p>
+                <div style="margin-top:24px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                    <a class="btn primary"
+                        href="https://play.google.com/store/apps/details?id=io.brushforge.brushforge_android_app&amp;referrer=utm_source%3Dbrushforgeapp.com%26utm_medium%3Dweb%26utm_campaign%3Dcontent%26utm_content%3Dabout_cta"
+                        rel="noopener" data-analytics-event="app_store_click" data-analytics-platform="android"
+                        data-analytics-placement="about_cta" data-analytics-page-family="about">Get
+                        on Android</a>
+                    <a class="btn" href="https://apps.apple.com/app/apple-store/id6749896227?pt=127902542&amp;ct=content&amp;mt=8" rel="noopener"
+                        data-analytics-event="app_store_click" data-analytics-platform="ios"
+                        data-analytics-placement="about_cta" data-analytics-page-family="about">Download for iOS</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-inner">
+            <a href="/" class="brand" aria-label="BrushForge home">
+                <img src="/assets/images/logo.jpg" class="logo" alt="" width="32" height="32" />
+                <span>BrushForge</span>
+            </a>
+            <div class="footer-links"><a href="/features/">Features</a>
+                <a href="/convert/">Converter</a>
+                <a href="/paints/">Paints</a>
+                <a href="/guides/">Guides</a>
+                <a href="/about.html">About</a>
+                <a href="/the-story.html" data-analytics-event="story_open"
+                    data-analytics-placement="about_footer">Story</a>
+                <a href="/privacy.html">Privacy</a>
+                <a href="/terms.html">Terms</a>
+                <a href="/support.html">Support</a>
+            </div>
+            <div class="small">© 2026 BrushForge. Paint names and marks belong to their respective owners.</div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

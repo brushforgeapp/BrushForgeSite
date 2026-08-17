@@ -1,0 +1,15 @@
+BrushForge press demo transcript
+
+0:00–0:04: Paint converter
+Compare paints across brands. Catalogue-based Delta E 2000 matching helps build a practical shortlist.
+
+0:04–0:08: My Paints
+Track the paints you own. Search and filter your collection before buying another bottle.
+
+0:08–0:12: Recipes and projects
+Save recipes. Plan projects. Keep repeatable paint steps and project notes with the rest of the workflow.
+
+0:12–0:16: BrushForge
+An offline-friendly painting toolkit. Core tools work offline. Available on iOS and Android. Free to start.
+
+The demo is silent. Its visuals use current BrushForge screenshots for the converter, My Paints collection, recipes, and projects.

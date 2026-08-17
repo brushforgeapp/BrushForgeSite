@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; script-src 'self' https://www.gstatic.com; connect-src https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com; base-uri 'none'; form-action 'self'">
+    <meta name="referrer" content="no-referrer">
+    <title>Account action | BrushForge</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" href="/assets/images/logo.jpg" sizes="any">
+    <style>
+        :root {
+          --bg: #050507;
+          --surface: rgba(22, 24, 29, 0.6);
+          --text: #eef2f6;
+          --muted: #94a3b8;
+          --border: rgba(255, 255, 255, 0.08);
+          --accent: #f0c75e;
+          --primary-gradient: linear-gradient(135deg, #F7C96C 0%, #E9A842 100%);
+          --radius-xl: 24px;
+          --font-display: Georgia, 'Times New Roman', serif;
+          --font-body: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          --glass-bg: rgba(255, 255, 255, 0.03);
+          --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image:
+              radial-gradient(circle at 15% 50%, rgba(80, 50, 200, 0.06), transparent 50%),
+              radial-gradient(circle at 85% 30%, rgba(240, 199, 94, 0.06), transparent 50%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 48px 32px;
+            text-align: center;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+            box-sizing: border-box;
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            object-fit: cover;
+            margin: 0 auto 24px auto;
+            box-shadow: 0 0 15px rgba(240, 199, 94, 0.4);
+            display: block;
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 32px;
+            margin: 0 0 12px 0;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        p {
+            color: var(--muted);
+            margin: 0 0 32px 0;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: none;
+            font-family: var(--font-body);
+            box-sizing: border-box;
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: #050507;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 20px rgba(240, 199, 94, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(240, 199, 94, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            color: var(--text);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:not(:disabled):hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #fff;
+            font-family: var(--font-body);
+            font-size: 16px;
+            transition: border-color 0.2s, background 0.2s;
+            box-sizing: border-box;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 3px rgba(240, 199, 94, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: rgba(148, 163, 184, 0.5);
+        }
+
+        /* States */
+        .state {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .state.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Spinner for loading state */
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto 24px auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Icon indicators */
+        .icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px auto;
+            font-size: 32px;
+        }
+
+        .icon-success {
+            background: rgba(46, 213, 115, 0.1);
+            color: #2ed573;
+            border: 1px solid rgba(46, 213, 115, 0.2);
+        }
+
+        .icon-error {
+            background: rgba(255, 71, 87, 0.1);
+            color: #ff4757;
+            border: 1px solid rgba(255, 71, 87, 0.2);
+        }
+
+        .form-error {
+            min-height: 1.5em;
+            margin: 12px 0 0;
+            color: #ff8c96;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <main class="container">
+        <div class="card" aria-busy="true">
+            <img src="/assets/images/logo.jpg" alt="BrushForge" class="logo">
+            
+            <!-- Loading State -->
+            <div id="state-loading" class="state active" role="status" aria-live="polite">
+                <div class="spinner"></div>
+                <h1 tabindex="-1">Verifying…</h1>
+                <p>Please wait while we process your request.</p>
+            </div>
+
+            <!-- Success State -->
+            <div id="state-success" class="state" role="status" aria-live="polite">
+                <div class="icon icon-success">✓</div>
+                <h1 id="success-title" tabindex="-1">Email verified</h1>
+                <p id="success-text">Your email has been confirmed.</p>
+                <button id="btn-success" class="btn btn-primary">Continue to BrushForge</button>
+            </div>
+
+            <!-- Error State -->
+            <div id="state-error" class="state" role="alert" aria-live="assertive">
+                <div class="icon icon-error">✕</div>
+                <h1 id="error-title" tabindex="-1">Invalid or expired link</h1>
+                <p id="error-text">This verification link is invalid or has expired.</p>
+                <button id="btn-home" class="btn btn-secondary">Back to homepage</button>
+            </div>
+            
+            <!-- Reset Password State -->
+            <div id="state-reset" class="state" aria-live="polite">
+                <h1 tabindex="-1">Reset password</h1>
+                <p id="reset-email-hint">Choose a new password for your account.</p>
+                
+                <form id="reset-form">
+                    <div class="form-group">
+                        <label for="new-password">New Password</label>
+                        <input type="password" id="new-password" class="form-control" placeholder="Enter new password" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm Password</label>
+                        <input type="password" id="confirm-password" class="form-control" placeholder="Confirm new password" required minlength="6">
+                    </div>
+                    <button type="submit" id="btn-reset-password" class="btn btn-primary" style="margin-top: 12px;">Save password</button>
+                    <p id="reset-error" class="form-error" role="alert"></p>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="/assets/js/auth-action.js"></script>
+</body>
+</html>
