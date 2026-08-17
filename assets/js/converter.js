@@ -464,6 +464,10 @@
 
     var listId = "bfc-results-" + componentCount;
     drop.id = listId;
+    drop.setAttribute("role", "listbox");
+    drop.setAttribute("aria-label", "Paint search results");
+    input.setAttribute("role", "combobox");
+    input.setAttribute("aria-autocomplete", "list");
     input.setAttribute("aria-controls", listId);
 
     function setStatus(message, kind) {
