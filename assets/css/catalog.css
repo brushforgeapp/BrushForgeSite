@@ -19,13 +19,49 @@
 .bf-updated { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
 
 /* swatches */
+.bf-swatch, .bf-swatch-xl { position: relative; overflow: hidden; isolation: isolate; }
 .bf-swatch { display: inline-block; width: 18px; height: 18px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.18); vertical-align: -4px; flex: none; }
 .bf-swatch-xl { width: 96px; height: 96px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.16); box-shadow: inset 0 0 24px rgba(0,0,0,0.25); flex: none; }
 .bf-swatch-pair { display: flex; flex: none; }
 .bf-swatch-pair span { width: 34px; height: 34px; border: 1px solid rgba(255,255,255,0.14); }
 .bf-swatch-pair span:first-child { border-radius: 9px 0 0 9px; border-right: none; }
 .bf-swatch-pair span:last-child { border-radius: 0 9px 9px 0; }
-.bf-metallic { background-image: linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 45%, rgba(255,255,255,0.12) 100%); }
+.bf-finish-metallic::after, .bf-metallic::after,
+.bf-finish-gloss::after, .bf-finish-satin::after,
+.bf-finish-transparent::after, .bf-finish-matte::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.bf-finish-metallic::after, .bf-metallic::after {
+  background-image:
+    linear-gradient(135deg, transparent 8%, rgba(255,255,255,0.32) 35%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0.26) 65%, transparent 90%),
+    linear-gradient(45deg, transparent 20%, rgba(255,255,255,0.13) 50%, transparent 80%);
+}
+.bf-finish-gloss::after {
+  background-image:
+    linear-gradient(to bottom, rgba(255,255,255,0.32), rgba(255,255,255,0.04) 45%, transparent 56%),
+    linear-gradient(to bottom, transparent 62%, rgba(255,255,255,0.07) 80%, transparent);
+}
+.bf-finish-satin::after {
+  background-image: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent 48%);
+}
+.bf-finish-transparent::after {
+  background-image:
+    linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.15) 75%),
+    linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.15) 75%);
+  background-position: 0 0, 50% 50%;
+  background-size: 50% 50%;
+}
+.bf-finish-matte::after {
+  background-image:
+    linear-gradient(to bottom, rgba(0,0,0,0.06), transparent),
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.025) 0 2px, transparent 2px 4px);
+}
+.bf-finish-unknown::after { display: none; }
 
 /* meta chips */
 .bf-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
@@ -191,7 +227,7 @@ a.bf-card:hover { border-color: rgba(240,199,94,0.45); transform: translateY(-2p
   .bf-hub-status { grid-column: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
-  a.bf-card, a.bf-card:hover { transition: none; transform: none; }
+  a.bf-card, a.bf-card:hover, .bfc-reference-details > summary { transition: none; transform: none; }
 }
 
 /* ---- instant converter (bfc) ---- */
@@ -227,6 +263,23 @@ a.bf-card:hover { border-color: rgba(240,199,94,0.45); transform: translateY(-2p
 .bfc-result { align-items: flex-start; }
 .bfc-result .rname { color: var(--text); text-decoration: none; }
 .bfc-result .rname:hover { color: var(--accent); }
+.bfc-result-heading { display: flex; align-items: flex-start; gap: 8px; }
+.bfc-result-swatch { width: 22px; height: 22px; flex-basis: 22px; border-radius: 6px; vertical-align: 0; }
+.bfc-result-copy { min-width: 0; }
+.bfc-appearance-label { display: inline-block; margin-left: 5px; color: var(--text); font-size: 11px; font-weight: 600; }
+.bfc-compatibility { display: inline-flex; align-items: center; width: fit-content; margin-top: 5px; padding: 2px 7px; border: 1px solid rgba(93,202,165,0.34); border-radius: 999px; color: #8fe6c4; background: rgba(93,202,165,0.1); font-size: 11px; font-weight: 600; line-height: 1.35; }
+.bfc-compatibility.is-reference { border-color: rgba(240,150,120,0.38); color: #f4ac90; background: rgba(240,150,120,0.1); }
+.bfc-results { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; min-width: 0; }
+.bfc-result-section, .bfc-reference-details, .bfc-results .bf-rows, .bfc-results .bf-row, .bfc-results .bf-tease { min-width: 0; max-width: 100%; }
+.bfc-results > .bf-tease { border: 1px dashed rgba(240,199,94,0.3); border-radius: 12px; }
+.bfc-result-section-title { margin: 0 0 8px; color: var(--text); font-size: 14px; line-height: 1.4; }
+.bfc-reference-details { border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); overflow: hidden; }
+.bfc-reference-details > summary { position: relative; padding: 11px 38px 11px 13px; cursor: pointer; list-style: none; color: var(--text); font-size: 13px; font-weight: 600; line-height: 1.4; }
+.bfc-reference-details > summary::-webkit-details-marker { display: none; }
+.bfc-reference-details > summary::after { content: "+"; position: absolute; top: 50%; right: 13px; transform: translateY(-52%); color: var(--accent); font-size: 18px; }
+.bfc-reference-details[open] > summary::after { content: "−"; }
+.bfc-reference-copy { margin: 0; padding: 0 13px 10px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.bfc-reference-details .bf-rows { border-top: 1px solid var(--border); border-radius: 0; }
 .bfc-warning { margin: 6px 0 2px; color: #f4ac90; font-size: 12px; line-height: 1.45; }
 .bfc-incompatible { line-height: 1.55; }
 .bfc-share { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin: 0 0 12px; }
@@ -240,9 +293,13 @@ a.bf-card:hover { border-color: rgba(240,199,94,0.45); transform: translateY(-2p
   .bfc-item > .bfc-imeta:last-child { flex: 0 0 calc(100% - 36px); margin-left: 36px; text-align: left; }
   .bfc-result { flex-wrap: wrap; }
   .bfc-score { width: 100%; align-items: flex-start; padding-left: 80px; }
-  .bfc-app-actions { width: 100%; }
+  .bfc-app-actions { width: 100%; flex-wrap: wrap; }
+  .bfc-app-actions a { min-width: 0; white-space: normal; }
 }
 @media (forced-colors: active) {
+  .bf-finish-metallic::after, .bf-metallic::after,
+  .bf-finish-gloss::after, .bf-finish-satin::after,
+  .bf-finish-transparent::after, .bf-finish-matte::after { display: none; }
   .bfc-option-swatch { display: none; }
   .bfc-item.active { background: Canvas; color: CanvasText; outline: 2px solid Highlight; outline-offset: -2px; }
   .bfc-input:focus,

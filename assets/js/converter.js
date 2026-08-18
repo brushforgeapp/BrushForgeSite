@@ -4,7 +4,7 @@
 (function (global) {
   "use strict";
 
-  var PUBLIC_CATALOGUE_SCHEMA_VERSION = "2";
+  var PUBLIC_CATALOGUE_SCHEMA_VERSION = "3";
   var MANIFEST_URLS = [
     "/assets/catalog/manifest.json?schema=" + PUBLIC_CATALOGUE_SCHEMA_VERSION,
     "/assets/catalog/catalog-manifest.json?schema=" + PUBLIC_CATALOGUE_SCHEMA_VERSION
@@ -14,6 +14,9 @@
   var BRAND_DISPLAY = { "Monument Hobbies": "Pro Acryl" };
   var PUBLIC_STATUSES = {
     current: true, legacy: true, reference_only: true, preview: true
+  };
+  var PUBLIC_APPEARANCES = {
+    matte: true, satin: true, gloss: true, metallic: true, transparent: true, unknown: true
   };
 
   function disp(brand) {
@@ -106,6 +109,24 @@
     return compact.length >= 2 ? compact.slice(0, 2) : "";
   }
 
+  function finishGroup(finish) {
+    var normalized = String(finish || "unknown").trim().toLowerCase()
+      .replace(/[\s_-]+/g, " ");
+    if (normalized === "metallic") return "metallic";
+    if (normalized === "transparent" || normalized === "translucent") return "transparent";
+    if (["matte", "satin", "gloss", "unknown"].indexOf(normalized) >= 0) return "standard";
+    return null;
+  }
+
+  function compatibleForMatching(source, candidate) {
+    if (!source || !candidate || typeof source.behavior !== "string"
+        || typeof candidate.behavior !== "string" || !source.behavior || !candidate.behavior) return false;
+    var sourceFinish = finishGroup(source.finish);
+    var candidateFinish = finishGroup(candidate.finish);
+    return sourceFinish !== null && source.behavior === candidate.behavior
+      && sourceFinish === candidateFinish;
+  }
+
   function cleanBase(value) {
     return String(value || "").replace(/\/+$/, "");
   }
@@ -153,16 +174,17 @@
   function validateIdentity(paint) {
     if (!paint || typeof paint !== "object") return false;
     if (!hasOnlyKeys(paint, [
-      "key", "name", "brand", "range", "line", "code", "path", "status", "swatch"
+      "key", "name", "brand", "range", "line", "code", "path", "status", "swatch", "appearance"
     ])) {
       return false;
     }
-    if (["key", "name", "brand", "path", "status", "swatch"].some(function (field) {
+    if (["key", "name", "brand", "path", "status", "swatch", "appearance"].some(function (field) {
       return typeof paint[field] !== "string" || !paint[field];
     })) return false;
     if (!/^[A-Za-z0-9_-]{12,64}$/.test(paint.key) || !isPublicPaintPath(paint.path)) return false;
     if (!isQuantizedSwatch(paint.swatch)) return false;
     if (!PUBLIC_STATUSES[paint.status]) return false;
+    if (!PUBLIC_APPEARANCES[paint.appearance]) return false;
     if (paint.range !== undefined && typeof paint.range !== "string") return false;
     if (paint.line !== undefined && typeof paint.line !== "string") return false;
     return paint.code === undefined || paint.code === null || typeof paint.code === "string";
@@ -187,6 +209,7 @@
     if (["type", "finish", "behavior"].some(function (field) {
       return typeof item[field] !== "string";
     })) return false;
+    if (finishGroup(item.finish) === null) return false;
     if (!PUBLIC_STATUSES[item.status]) return false;
     return item.warning === undefined || item.warning === null || typeof item.warning === "string";
   }
@@ -209,7 +232,7 @@
         || typeof source.code !== "string") return false;
     return ["type", "finish", "behavior"].every(function (field) {
       return typeof source[field] === "string";
-    });
+    }) && finishGroup(source.finish) !== null;
   }
 
   function createCatalogClient(fetchJson, manifestUrls) {
@@ -296,18 +319,27 @@
         resultPromises[publicKey] = loadManifest(false).then(function (current) {
           return request(current.resultBase + "/" + encodeURIComponent(publicKey) + ".json", "Paint result");
         }).then(function (raw) {
-          var matchBrands = {};
+          var resultBrands = {};
           if (!raw || !hasOnlyKeys(raw, [
-            "version", "source", "matches", "similar", "highlight", "shadow", "complements"
+            "version", "source", "matches", "references", "similar", "highlight", "shadow", "complements"
           ]) || raw.version !== manifest.version || !validateResultSource(raw.source)
-              || raw.source.key !== publicKey || !Array.isArray(raw.matches)
+              || raw.source.key !== publicKey || !Array.isArray(raw.matches) || !Array.isArray(raw.references)
               || !Array.isArray(raw.similar) || !Array.isArray(raw.complements)
-              || !raw.matches.every(validateDerivedItem) || !raw.similar.every(validateDerivedItem)
+              || !raw.matches.every(validateDerivedItem) || !raw.references.every(validateDerivedItem)
+              || !raw.similar.every(validateDerivedItem)
               || !raw.complements.every(validateResultItem)
-              || raw.matches.length > 16 || raw.similar.length > 3 || raw.complements.length > 2
+              || raw.matches.length > 16 || raw.references.length > 16
+              || raw.similar.length > 3 || raw.complements.length > 2
               || raw.matches.some(function (item) {
-                if (matchBrands[item.brand]) return true;
-                matchBrands[item.brand] = true;
+                return !compatibleForMatching(raw.source, item);
+              })
+              || raw.references.some(function (item) {
+                return compatibleForMatching(raw.source, item)
+                  || typeof item.warning !== "string" || !item.warning.trim();
+              })
+              || raw.matches.concat(raw.references).some(function (item) {
+                if (resultBrands[item.brand]) return true;
+                resultBrands[item.brand] = true;
                 return false;
               })
               || (raw.highlight !== null && raw.highlight !== undefined && !validateResultItem(raw.highlight))
@@ -359,6 +391,8 @@
     deScale: deScale,
     normalizeSearch: normalizeSearch,
     searchBucket: searchBucket,
+    finishGroup: finishGroup,
+    compatibleForMatching: compatibleForMatching,
     isQuantizedSwatch: isQuantizedSwatch,
     normalizeManifest: normalizeManifest,
     createCatalogClient: createCatalogClient,
@@ -390,9 +424,30 @@
     return node;
   }
 
-  function swatchHtml(hex, metallic) {
-    return '<span class="bf-swatch' + (metallic ? " bf-metallic" : "")
-      + '" style="background:' + esc(hex) + '"></span>';
+  function finishAppearance(paint) {
+    var finish = String(paint && paint.finish || "").toLowerCase();
+    var behavior = String(paint && paint.behavior || "").toLowerCase();
+    if (finish === "metallic" || behavior === "metallic") return "metallic";
+    if (finish === "transparent" || finish === "translucent") return "transparent";
+    if (PUBLIC_APPEARANCES[finish]) return finish;
+    return "unknown";
+  }
+
+  function appearanceLabel(appearance) {
+    return {
+      matte: "Matte finish",
+      satin: "Satin finish",
+      gloss: "Gloss finish",
+      metallic: "Metallic finish",
+      transparent: "Transparent finish",
+      unknown: "Finish unknown"
+    }[appearance] || "Finish unknown";
+  }
+
+  function swatchHtml(hex, appearance, extraClass) {
+    var finish = PUBLIC_APPEARANCES[appearance] ? appearance : "unknown";
+    return '<span class="bf-swatch bf-finish-' + finish + (extraClass ? " " + extraClass : "")
+      + '" style="background-color:' + esc(hex) + '" aria-hidden="true"></span>';
   }
 
   function debounce(fn, delay) {
@@ -432,7 +487,10 @@
       opaque: "opaque color",
       metallic: "metallic",
       wash: "wash",
-      single_coat: "Contrast, Speedpaint or Xpress-style single-coat paint",
+      shade: "shade",
+      contrast: "Contrast paint",
+      speedpaint: "Speedpaint",
+      xpress: "Xpress Color",
       ink: "ink",
       glaze: "glaze",
       other_translucent: "other translucent paint"
@@ -492,6 +550,7 @@
     var trackedSearch = false;
 
     var listId = "bfc-results-" + componentCount;
+    var compatibleTitleId = "bfc-compatible-title-" + componentCount;
     drop.id = listId;
     drop.setAttribute("role", "listbox");
     drop.setAttribute("aria-label", "Paint search results");
@@ -590,12 +649,12 @@
       }
       hits.forEach(function (paint, index) {
         var item = element("button", "bfc-item",
-          '<span class="bf-swatch bfc-option-swatch" style="background-color:' + esc(paint.swatch)
-          + '" aria-hidden="true"></span>'
+          swatchHtml(paint.swatch, paint.appearance, "bfc-option-swatch")
           + '<span class="bfc-iname">' + esc(paint.name)
           + (paint.code ? ' <span class="bfc-imeta">' + esc(paint.code) + "</span>" : "") + "</span>"
           + '<span class="bfc-imeta">' + esc(disp(paint.brand))
           + (rangeOf(paint) ? " · " + esc(rangeOf(paint)) : "")
+          + ' <span class="bfc-appearance-label">' + esc(appearanceLabel(paint.appearance)) + "</span>"
           + " " + statusBadge(paint) + "</span>");
         item.type = "button";
         item.id = drop.id + "-option-" + index;
@@ -732,7 +791,8 @@
 
     function allTargetBrands() {
       var brands = {};
-      (resultData ? resultData.matches : []).forEach(function (paint) {
+      var candidates = resultData ? resultData.matches.concat(resultData.references) : [];
+      candidates.forEach(function (paint) {
         if (paint.brand !== source.brand) brands[paint.brand] = true;
       });
       if (targetBrand !== "ALL" && targetBrand !== source.brand) brands[targetBrand] = true;
@@ -749,8 +809,19 @@
       return rows;
     }
 
+    function computeReferences() {
+      var rows = (resultData ? resultData.references : []).filter(function (paint) {
+        return targetBrand === "ALL" || paint.brand === targetBrand;
+      });
+      rows.sort(function (a, b) {
+        return a.de - b.de || a.path.localeCompare(b.path);
+      });
+      return rows;
+    }
+
     function targetSlugForBrand(brand) {
-      var target = resultData && resultData.matches.find(function (paint) { return paint.brand === brand; });
+      var candidates = resultData ? resultData.matches.concat(resultData.references) : [];
+      var target = candidates.find(function (paint) { return paint.brand === brand; });
       return target ? brandSlugFromPath(target.path) : normalizeSearch(disp(brand)).replace(/\s+/g, "-");
     }
 
@@ -802,19 +873,29 @@
 
     function matchRow(target) {
       var tier = deScale(target.de);
+      var isReference = !compatibleForMatching(source, target);
+      var compatibility = isReference
+        ? "Different paint behavior or finish group, color reference only"
+        : "Compatible paint behavior and finish group";
       var warning = target.warning
         ? '<p class="bfc-warning">' + esc(target.warning) + "</p>"
         : (target.de > 10
-          ? '<p class="bfc-warning">No close same-type equivalent found; nearest recorded color shown. '
+          ? '<p class="bfc-warning">No close compatible equivalent found; nearest recorded color shown. '
             + "Treat it as a shortlist reference and test dried physical swatches.</p>"
           : "");
       return '<article class="bf-row bfc-result">'
-        + '<span class="bf-swatch-pair" aria-label="Screen preview swatches"><span style="background:'
-        + esc(source.swatch) + '"></span><span style="background:' + esc(target.swatch) + '"></span></span>'
-        + '<span class="grow"><a class="rname" href="' + esc(paintHref(target.path)) + '">'
+        + '<span class="bf-swatch-pair" aria-hidden="true"><span style="background-color:'
+        + esc(source.swatch) + '"></span><span style="background-color:' + esc(target.swatch) + '"></span></span>'
+        + '<span class="grow"><span class="bfc-result-heading">'
+        + swatchHtml(target.swatch, finishAppearance(target), "bfc-result-swatch")
+        + '<span class="bfc-result-copy"><a class="rname" href="' + esc(paintHref(target.path)) + '">'
         + esc(target.name) + (target.code ? " · " + esc(target.code) : "") + '</a><br>'
         + '<span class="rmeta">' + esc(disp(target.brand))
-        + (rangeOf(target) ? " · " + esc(rangeOf(target)) : "") + '</span><br>'
+        + (rangeOf(target) ? " · " + esc(rangeOf(target)) : "") + '</span></span></span>'
+        + '<span class="rmeta">' + esc(target.type) + " · " + esc(target.finish) + " · "
+        + esc(behaviorLabel(target.behavior)) + '</span><br>'
+        + '<span class="bfc-compatibility' + (isReference ? " is-reference" : "") + '">'
+        + esc(compatibility) + '</span><br>'
         + '<span class="rmeta">Catalogue updated ' + esc(formatDate(DATA_UPDATED)) + '</span>'
         + warning + '<a class="bfc-report" href="' + esc(reportUrl(target))
         + '" data-analytics-event="issue_report_start" data-analytics-placement="converter_result" '
@@ -836,33 +917,42 @@
       });
 
       var matches = computeMatches();
-      var rowsHtml = matches.map(matchRow).join("");
-      if (!matches.length) {
-        rowsHtml = '<div class="bfc-empty bfc-incompatible">No same-type equivalent or same-pool '
-          + "reference is available for "
-          + esc(targetBrand === "ALL" ? "another included brand" : disp(targetBrand)) + ".</div>";
-      }
+      var references = computeReferences();
+      var compatibleRows = matches.map(matchRow).join("");
+      if (!matches.length) compatibleRows = '<div class="bfc-empty bfc-incompatible">No equivalent with '
+        + "compatible paint behavior and finish group is available for "
+        + esc(targetBrand === "ALL" ? "another included brand" : disp(targetBrand)) + ".</div>";
+      var compatibleHtml = '<section class="bfc-result-section" aria-labelledby="' + compatibleTitleId + '">'
+        + '<h3 class="bfc-result-section-title" id="' + compatibleTitleId
+        + '">Closest matches with compatible behavior and finish group</h3>'
+        + '<div class="bf-rows">' + compatibleRows + "</div></section>";
+      var referenceHtml = references.length
+        ? '<details class="bfc-reference-details"><summary>Color references with different paint behavior or finish group ('
+          + references.length + ')</summary><p class="bfc-reference-copy">These compare recorded screen color only. '
+          + 'They are not compatible substitutes for the selected paint behavior and finish group.</p><div class="bf-rows">'
+          + references.map(matchRow).join("") + "</div></details>"
+        : "";
 
       var sourceStatus = {
         legacy: " · legacy range",
         reference_only: " · reference-only range",
         preview: " · pre-retail preview"
       }[source.status] || "";
-      var metallic = source.behavior === "metallic" || /metallic/i.test(source.type + " " + source.finish);
       var appLabel = source.status === "preview" ? "Continue in BrushForge" : "Filter matches by paints you own";
-      panel.innerHTML = '<div class="bfc-source">' + swatchHtml(source.swatch, metallic)
+      panel.innerHTML = '<div class="bfc-source">' + swatchHtml(source.swatch, finishAppearance(source))
         + '<span><strong>' + esc(source.name) + "</strong>" + (source.code ? " · " + esc(source.code) : "")
         + '<br><span class="bfc-imeta">' + esc(disp(source.brand))
         + (rangeOf(source) ? " · " + esc(rangeOf(source)) : "")
         + " · " + esc(source.type) + " · " + esc(source.finish) + " · "
         + esc(behaviorLabel(source.behavior)) + esc(sourceStatus) + '</span><br>'
-        + '<span class="bfc-imeta">Screen swatch is an approximate preview.</span><br>'
+        + '<span class="bfc-imeta">Preview texture represents the recorded finish. It does not simulate the dried physical paint.</span><br>'
         + '<span class="bfc-imeta">Catalogue updated ' + esc(formatDate(DATA_UPDATED)) + "</span></span></div>"
         + '<div class="bfc-pills" role="group" aria-label="Target brand">' + pills.join("") + "</div>"
         + '<div class="bfc-share"><button type="button" class="bfc-copy">Copy link</button>'
         + (global.navigator.share ? '<button type="button" class="bfc-share-button">Share</button>' : "")
         + '<span class="bfc-share-status" role="status" aria-live="polite"></span></div>'
-        + '<div class="bf-rows">' + rowsHtml + '<div class="bf-tease"><span>Continue with this source and target context in BrushForge, then filter against paints you own.</span>'
+        + '<div class="bfc-results">' + compatibleHtml + referenceHtml
+        + '<div class="bf-tease"><span>Continue with this source and target context in BrushForge, then filter against paints you own.</span>'
         + '<span class="bfc-app-actions"><a href="' + esc(androidUrl) + '" rel="noopener" '
         + 'data-analytics-event="open_in_app" data-analytics-placement="converter_result" '
         + 'data-analytics-page-family="' + esc(analyticsPageFamily) + '" '
