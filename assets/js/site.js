@@ -6,6 +6,12 @@
   const mobileQuery = window.matchMedia('(max-width: 768px)');
   const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    })[character]);
+  }
+
   function activateDeferredStylesheets() {
     document.querySelectorAll('link[data-deferred-stylesheet]').forEach((stylesheet) => {
       stylesheet.media = 'all';
@@ -548,6 +554,92 @@
     render(consentState());
   }
 
+  function setupStoreCtaViewTracking() {
+    if (!("IntersectionObserver" in window)) return;
+
+    const selector = [
+      'a[data-analytics-event="app_store_click"][data-analytics-platform]',
+      'a[data-analytics-event="open_in_app"][data-analytics-platform]',
+    ].join(',');
+    const observed = new Set();
+    const counted = new WeakSet();
+    const timers = new Map();
+    let consentGranted = window.BRUSHFORGE_CONSENT_STATE?.state === 'granted';
+
+    function clearTimer(link) {
+      const timer = timers.get(link);
+      if (timer) window.clearTimeout(timer);
+      timers.delete(link);
+    }
+
+    function trackAfterDelay(link) {
+      if (!consentGranted || counted.has(link) || timers.has(link)) return;
+      const timer = window.setTimeout(() => {
+        timers.delete(link);
+        if (!consentGranted || counted.has(link)) return;
+        const rect = link.getBoundingClientRect();
+        const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
+        const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
+        const visibleArea = visibleWidth * visibleHeight;
+        const totalArea = Math.max(1, rect.width * rect.height);
+        if (visibleArea / totalArea < 0.5) return;
+        const tracked = window.brushForgeTrack?.('store_cta_view', {
+          platform: link.dataset.analyticsPlatform,
+          placement: link.dataset.analyticsPlacement,
+          page_family: link.dataset.analyticsPageFamily,
+          source_brand: link.dataset.analyticsSourceBrand,
+        });
+        if (tracked) counted.add(link);
+      }, 1000);
+      timers.set(link, timer);
+    }
+
+    function atLeastHalfVisible(link) {
+      const rect = link.getBoundingClientRect();
+      const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
+      const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
+      return (visibleWidth * visibleHeight) / Math.max(1, rect.width * rect.height) >= 0.5;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.intersectionRatio >= 0.5) trackAfterDelay(entry.target);
+        else clearTimer(entry.target);
+      });
+    }, { threshold: [0, 0.5, 1] });
+
+    function observe(root) {
+      const links = [];
+      if (root instanceof Element && root.matches(selector)) links.push(root);
+      links.push(...Array.from(root.querySelectorAll?.(selector) || []));
+      links.forEach((link) => {
+        if (observed.has(link)) return;
+        observed.add(link);
+        observer.observe(link);
+      });
+    }
+
+    observe(document);
+    if ('MutationObserver' in window) {
+      const mutationObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          mutation.addedNodes.forEach((node) => {
+            if (node instanceof Element) observe(node);
+          });
+        });
+      });
+      mutationObserver.observe(document.body, { childList: true, subtree: true });
+    }
+
+    document.addEventListener('brushforge:consent-state', (event) => {
+      consentGranted = event.detail?.state === 'granted';
+      if (!consentGranted) timers.forEach((_timer, link) => clearTimer(link));
+      else observed.forEach((link) => {
+        if (atLeastHalfVisible(link)) trackAfterDelay(link);
+      });
+    });
+  }
+
   function setupContextualInstallPrompt() {
     const promptQuery = window.matchMedia('(max-width: 768px)');
     const device = installDevice();
@@ -724,6 +816,8 @@
           || sourceData.downloadUrl
           || configElement.dataset.downloadUrl
           || configured.downloadUrl,
+        sourceBrand: supplied.sourceBrand || sourceData.analyticsSourceBrand,
+        targetBrand: supplied.targetBrand || sourceData.analyticsTargetBrand,
       };
     }
 
@@ -747,12 +841,18 @@
       action.href = destination.href;
       action.dataset.analyticsPlacement = options.placement;
       action.dataset.analyticsPageFamily = options.pageFamily;
+      if (options.sourceBrand) action.dataset.analyticsSourceBrand = options.sourceBrand;
+      else delete action.dataset.analyticsSourceBrand;
+      if (options.targetBrand) action.dataset.analyticsTargetBrand = options.targetBrand;
+      else delete action.dataset.analyticsTargetBrand;
 
       if (destination.isStore) {
         action.rel = 'noopener';
+        action.dataset.analyticsEvent = 'app_store_click';
         action.dataset.analyticsPlatform = destination.platform;
       } else {
         action.removeAttribute('rel');
+        delete action.dataset.analyticsEvent;
         delete action.dataset.analyticsPlatform;
       }
 
@@ -826,10 +926,17 @@
         platform,
         placement: currentOptions.placement,
         page_family: currentOptions.pageFamily,
+        source_brand: currentOptions.sourceBrand,
+        target_brand: currentOptions.targetBrand,
       });
     });
 
     dismissButton.addEventListener('click', () => {
+      analyticsTrack('install_prompt_dismiss', {
+        platform: device.platform,
+        placement: currentOptions.placement,
+        page_family: currentOptions.pageFamily,
+      });
       dismissed = true;
       try {
         window.sessionStorage.setItem(sessionKey, 'true');
@@ -973,6 +1080,92 @@
     handleScroll();
   }
 
+  function setupChartFilters() {
+    const mount = document.querySelector('[data-chart-filter-mount]');
+    if (!mount) return;
+    const rows = Array.from(document.querySelectorAll('[data-chart-row]'));
+    if (!rows.length) return;
+
+    const behaviors = [...new Set(rows.map((row) => row.dataset.behavior).filter(Boolean))]
+      .sort((first, second) => first.localeCompare(second));
+    const behaviorOptions = behaviors.map((behavior) => (
+      `<option value="${escapeHtml(behavior)}">${escapeHtml(behavior)}</option>`
+    )).join('');
+    mount.innerHTML = [
+      '<form class="bf-chart-filters" data-chart-filters aria-label="Filter this conversion chart">',
+      '<div class="bf-chart-filter-search"><label for="bf-chart-search">Search source paints</label>',
+      '<input id="bf-chart-search" type="search" autocomplete="off" placeholder="Paint name or code"></div>',
+      '<div><label for="bf-chart-behavior">Paint behavior</label>',
+      `<select id="bf-chart-behavior"><option value="">All behaviors</option>${behaviorOptions}</select></div>`,
+      '<label class="bf-chart-check"><input type="checkbox" data-chart-compatible> Compatible results only</label>',
+      '<label class="bf-chart-check"><input type="checkbox" data-chart-close> Close results, ΔE2000 ≤5</label>',
+      '<button class="btn" type="reset">Reset filters</button>',
+      '<p class="bf-chart-filter-status" role="status" aria-live="polite" aria-atomic="true"></p>',
+      '</form>',
+    ].join('');
+
+    const form = mount.querySelector('[data-chart-filters]');
+    const query = form.querySelector('#bf-chart-search');
+    const behavior = form.querySelector('#bf-chart-behavior');
+    const compatible = form.querySelector('[data-chart-compatible]');
+    const close = form.querySelector('[data-chart-close]');
+    const status = form.querySelector('.bf-chart-filter-status');
+    const trackedFilters = new Set();
+
+    function normalizedSearch(value) {
+      return String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+        .toLocaleLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
+    }
+
+    function trackFilter(feature) {
+      if (trackedFilters.has(feature)) return;
+      trackedFilters.add(feature);
+      window.brushForgeTrack?.('chart_filter_use', { feature });
+    }
+
+    function applyFilters() {
+      const term = normalizedSearch(query.value);
+      let visible = 0;
+      rows.forEach((row) => {
+        const distance = Number(row.dataset.distance);
+        const matches = (!term || row.dataset.sourceSearch.includes(term))
+          && (!behavior.value || row.dataset.behavior === behavior.value)
+          && (!compatible.checked || row.dataset.compatible === 'true')
+          && (!close.checked || (row.dataset.distance !== '' && distance <= 5));
+        row.hidden = !matches;
+        if (matches) visible += 1;
+      });
+      document.querySelectorAll('.bf-chart-group').forEach((group) => {
+        group.hidden = !group.querySelector('[data-chart-row]:not([hidden])');
+      });
+      status.textContent = `Showing ${visible} of ${rows.length} source paints.`;
+    }
+
+    query.addEventListener('input', () => {
+      if (query.value.trim()) trackFilter('search');
+      applyFilters();
+    });
+    behavior.addEventListener('change', () => {
+      if (behavior.value) trackFilter('behavior');
+      applyFilters();
+    });
+    compatible.addEventListener('change', () => {
+      if (compatible.checked) trackFilter('compatible');
+      applyFilters();
+    });
+    close.addEventListener('change', () => {
+      if (close.checked) trackFilter('close');
+      applyFilters();
+    });
+    form.addEventListener('reset', () => {
+      window.requestAnimationFrame(() => {
+        trackFilter('reset');
+        applyFilters();
+      });
+    });
+    applyFilters();
+  }
+
   function setupReveals() {
     const elements = document.querySelectorAll('.reveal');
     if (!elements.length) return;
@@ -1006,6 +1199,8 @@
       window.requestAnimationFrame(setupStorePriority);
     });
     setupAnalyticsConsentUI();
+    setupStoreCtaViewTracking();
+    setupChartFilters();
     setupContextualInstallPrompt();
     setupReveals();
   }

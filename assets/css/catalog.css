@@ -178,6 +178,33 @@ a.bf-card:hover { border-color: rgba(240,199,94,0.45); transform: translateY(-2p
 .bf-store-icon { display: block; flex: 0 0 auto; object-fit: contain; }
 .bf-proof { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--muted); margin-top: 8px; }
 
+/* One early contextual app bridge, separate from the complete two-store CTA. */
+.bf-app-bridge { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin: 30px 0 34px; padding: 20px 22px; border: 1px solid rgba(240,199,94,0.34); border-radius: var(--radius-xl, 24px); background: linear-gradient(135deg, rgba(240,199,94,0.11), rgba(240,199,94,0.025) 58%), var(--surface); }
+.bf-app-bridge-copy { flex: 1 1 560px; }
+.bf-app-bridge h2 { margin: 0 0 5px; font-family: var(--font-display, Georgia, serif); font-size: 22px; line-height: 1.25; }
+.bf-app-bridge p { max-width: 65ch; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.bf-app-bridge > .btn { flex: 0 1 auto; min-height: 48px; }
+
+/* Demand-led internal links. The source manifest stays private. */
+.bf-popular { margin: 26px 0 12px; padding-top: 2px; }
+.bf-popular .bf-h2 { margin-bottom: 4px; }
+.bf-prose { max-width: 78ch; color: var(--muted); font-size: 15px; line-height: 1.7; }
+.bf-prose a { color: var(--accent); }
+.bf-prose li + li { margin-top: 6px; }
+.bf-data-table { margin: 18px 0 30px; }
+.bf-data-table th > span, .bf-data-table td > span { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; font-weight: 400; }
+.bf-data-table td strong { color: var(--text); }
+
+/* Conversion-chart controls are inserted by JavaScript. All rows remain in HTML. */
+.bf-chart-filters { display: grid; grid-template-columns: minmax(220px, 2fr) minmax(170px, 1fr) auto auto auto; gap: 12px; align-items: end; margin: 24px 0; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-lg, 16px); background: var(--surface); }
+.bf-chart-filters label:not(.bf-chart-check) { display: block; margin-bottom: 5px; color: var(--muted); font-size: 11.5px; font-weight: 600; }
+.bf-chart-filters input[type="search"], .bf-chart-filters select { width: 100%; box-sizing: border-box; min-height: 44px; border: 1px solid var(--border); border-radius: 10px; padding: 9px 11px; color: var(--text); background: var(--surface-2); font: 13px var(--font-body, system-ui, sans-serif); }
+.bf-chart-filters input[type="search"]:focus, .bf-chart-filters select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.bf-chart-check { display: flex; align-items: center; gap: 8px; min-height: 44px; color: var(--text); font-size: 12.5px; line-height: 1.35; }
+.bf-chart-check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.bf-chart-filters > .btn { min-height: 44px; }
+.bf-chart-filter-status { grid-column: 1 / -1; min-height: 18px; margin: 0; color: var(--muted); font-size: 12px; }
+
 /* Direct factual answer */
 .bf-answer { margin: 18px 0 8px; padding: 14px 16px; border-left: 3px solid var(--accent); border-radius: 0 12px 12px 0; background: rgba(240,199,94,0.055); color: var(--text); font-size: 14px; line-height: 1.65; }
 .bf-answer a { color: var(--accent); }
@@ -223,6 +250,10 @@ a.bf-card:hover { border-color: rgba(240,199,94,0.45); transform: translateY(-2p
 
 :where(.bf-main) a:focus-visible, :where(.bf-main) summary:focus-visible, :where(.bf-main) button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 
+@media (max-width: 900px) {
+  .bf-chart-filters { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .bf-chart-filter-status { grid-column: 1 / -1; }
+}
 @media (max-width: 700px) {
   .bf-hero { flex-direction: column; align-items: flex-start; gap: 14px; }
   .bf-cta { flex-direction: column; align-items: flex-start; }
@@ -235,6 +266,11 @@ a.bf-card:hover { border-color: rgba(240,199,94,0.45); transform: translateY(-2p
   .bf-tier-strip > span:last-child { border-bottom: none; }
   .bf-hub-tools { grid-template-columns: 1fr; }
   .bf-hub-status { grid-column: auto; }
+  .bf-app-bridge { flex-direction: column; align-items: stretch; padding: 18px; }
+  .bf-app-bridge-copy { flex-basis: auto; }
+  .bf-app-bridge > .btn { width: 100%; }
+  .bf-chart-filters { grid-template-columns: 1fr; }
+  .bf-chart-filter-status { grid-column: auto; }
 }
 @media (max-width: 460px) {
   .bf-cta { padding: 20px 18px; }
@@ -318,6 +354,13 @@ a.bf-card:hover { border-color: rgba(240,199,94,0.45); transform: translateY(-2p
   .bfc-item.active { background: Canvas; color: CanvasText; outline: 2px solid Highlight; outline-offset: -2px; }
   .bfc-input:focus,
   .bfc-input:focus-visible {
+    border-color: Highlight;
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+    box-shadow: none;
+  }
+  .bf-chart-filters input:focus, .bf-chart-filters select:focus,
+  .bf-chart-filters button:focus-visible {
     border-color: Highlight;
     outline: 2px solid Highlight;
     outline-offset: 2px;

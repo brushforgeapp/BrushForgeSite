@@ -13,8 +13,11 @@
     "copy_match_link",
     "open_in_app",
     "app_store_click",
+    "store_cta_view",
     "download_page_open",
     "install_prompt_view",
+    "install_prompt_dismiss",
+    "chart_filter_use",
     "methodology_open",
     "issue_report_start",
     "pricing_view",
@@ -319,7 +322,8 @@
 
     var eventName = name === "pageview" ? "page_view" : name;
     var eventParams = cleanProps(props);
-    if (name === "app_store_click" && !["android", "ios"].includes(eventParams.platform)) return false;
+    if ((name === "app_store_click" || name === "store_cta_view")
+      && !["android", "ios"].includes(eventParams.platform)) return false;
     eventParams.send_to = measurementId;
     eventParams.page_location = privacySafeUrl();
     if (name === "pageview") eventParams.page_title = privacySafeTitle();
@@ -441,6 +445,8 @@
         send("app_store_click", {
           platform: platform,
           placement: target.dataset.analyticsPlacement || pageFamily(),
+          source_brand: target.dataset.analyticsSourceBrand,
+          target_brand: target.dataset.analyticsTargetBrand,
         });
       }
     } else if (!explicitName && href.includes("/methodology/")) {

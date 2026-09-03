@@ -952,13 +952,17 @@
         + (global.navigator.share ? '<button type="button" class="bfc-share-button">Share</button>' : "")
         + '<span class="bfc-share-status" role="status" aria-live="polite"></span></div>'
         + '<div class="bfc-results">' + compatibleHtml + referenceHtml
-        + '<div class="bf-tease"><span>Continue with this source and target context in BrushForge, then filter against paints you own.</span>'
+        + '<div class="bf-tease"><span>Found a useful shortlist? In the app, filter it by paints you own and keep the result with Your Palette, recipes, and projects.</span>'
         + '<span class="bfc-app-actions"><a href="' + esc(androidUrl) + '" rel="noopener" '
         + 'data-analytics-event="open_in_app" data-analytics-placement="converter_result" '
         + 'data-analytics-page-family="' + esc(analyticsPageFamily) + '" '
+        + 'data-analytics-source-brand="' + esc(source.brand) + '" '
+        + 'data-analytics-target-brand="' + esc(targetBrand === "ALL" ? "all" : targetBrand) + '" '
         + 'data-analytics-platform="android">' + esc(appLabel) + " on Android</a>"
         + '<a href="' + esc(iosUrl) + '" rel="noopener" data-analytics-event="open_in_app" '
         + 'data-analytics-placement="converter_result" data-analytics-page-family="' + esc(analyticsPageFamily) + '" '
+        + 'data-analytics-source-brand="' + esc(source.brand) + '" '
+        + 'data-analytics-target-brand="' + esc(targetBrand === "ALL" ? "all" : targetBrand) + '" '
         + 'data-analytics-platform="ios">' + esc(appLabel) + " on iOS</a></span></div></div>";
       panel.hidden = false;
 
