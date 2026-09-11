@@ -214,6 +214,7 @@ a.bf-card:hover { border-color: rgba(240,199,94,0.45); transform: translateY(-2p
 .bf-report-inline { display: block; width: fit-content; margin-top: 5px; }
 .bf-legacy { border-color: rgba(185,195,207,0.45); }
 .bf-legacy-label, .bfc-legacy { color: #d1b784; font-weight: 600; }
+.bf-preview-badge { display: inline-block; margin: 4px 0 4px 8px; border-color: rgba(244,190,78,0.55); color: #f4d388; }
 
 /* FAQ */
 .bf-faq { margin-top: 8px; }

@@ -678,7 +678,9 @@
       homepage: 'Keep paints, recipes, and projects together.',
       web_converter: 'Keep your paint matches with you at the painting desk.',
       conversion_chart: 'Continue this paint comparison in BrushForge.',
-      paint_detail: 'Keep this paint with your collection and projects.',
+      paint_detail: document.body.dataset.cataloguePreview === 'true'
+        ? 'Explore BrushForge while this paint is prepared for the app catalogue.'
+        : 'Keep this paint with your collection and projects.',
       paint_hub: 'Take the paint catalogue to your painting desk.',
       guide: 'Put this guide into practice with BrushForge.',
       feature: 'Continue this workflow in BrushForge.',
@@ -1059,10 +1061,13 @@
     // Both events accept optional detail overrides for message, label, placement,
     // pageFamily, campaign, androidUrl, iosUrl, and downloadUrl.
     document.addEventListener('brushforge:converter-result', (event) => {
+      const detail = event.detail && typeof event.detail === 'object' ? event.detail : {};
       engage(null, {
         placement: 'converter_result',
-        message: 'Keep this paint match with you at the painting desk.',
-        ...(event.detail && typeof event.detail === 'object' ? event.detail : {}),
+        message: detail.cataloguePreview
+          ? 'Explore BrushForge while this preview paint is prepared for the app catalogue.'
+          : 'Keep this paint match with you at the painting desk.',
+        ...detail,
       });
     });
     document.addEventListener('brushforge:install-prompt', (event) => {

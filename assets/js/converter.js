@@ -883,6 +883,9 @@
           ? '<p class="bfc-warning">No close compatible equivalent found; nearest recorded color shown. '
             + "Treat it as a shortlist reference and test dried physical swatches.</p>"
           : "");
+      var previewTarget = target.status === "preview"
+        ? '<span class="bf-chip bf-preview-badge">Coming in the next app catalogue update</span>'
+        : "";
       return '<article class="bf-row bfc-result">'
         + '<span class="bf-swatch-pair" aria-hidden="true"><span style="background-color:'
         + esc(source.swatch) + '"></span><span style="background-color:' + esc(target.swatch) + '"></span></span>'
@@ -893,7 +896,7 @@
         + '<span class="rmeta">' + esc(disp(target.brand))
         + (rangeOf(target) ? " · " + esc(rangeOf(target)) : "") + '</span></span></span>'
         + '<span class="rmeta">' + esc(target.type) + " · " + esc(target.finish) + " · "
-        + esc(behaviorLabel(target.behavior)) + '</span><br>'
+        + esc(behaviorLabel(target.behavior)) + '</span>' + previewTarget + '<br>'
         + '<span class="bfc-compatibility' + (isReference ? " is-reference" : "") + '">'
         + esc(compatibility) + '</span><br>'
         + '<span class="rmeta">Catalogue updated ' + esc(formatDate(DATA_UPDATED)) + '</span>'
@@ -936,15 +939,20 @@
       var sourceStatus = {
         legacy: " · legacy range",
         reference_only: " · reference-only range",
-        preview: " · pre-retail preview"
+        preview: " · website catalogue preview"
       }[source.status] || "";
-      var appLabel = source.status === "preview" ? "Continue in BrushForge" : "Filter matches by paints you own";
+      var sourcePreview = source.status === "preview";
+      var appLabel = sourcePreview ? "Explore BrushForge" : "Filter matches by paints you own";
+      var appCopy = sourcePreview
+        ? "This paint is planned for the next BrushForge app catalogue update. You can compare it here now."
+        : "Found a useful shortlist? In the app, filter it by paints you own and keep the result with Your Palette, recipes, and projects.";
       panel.innerHTML = '<div class="bfc-source">' + swatchHtml(source.swatch, finishAppearance(source))
         + '<span><strong>' + esc(source.name) + "</strong>" + (source.code ? " · " + esc(source.code) : "")
         + '<br><span class="bfc-imeta">' + esc(disp(source.brand))
         + (rangeOf(source) ? " · " + esc(rangeOf(source)) : "")
         + " · " + esc(source.type) + " · " + esc(source.finish) + " · "
         + esc(behaviorLabel(source.behavior)) + esc(sourceStatus) + '</span><br>'
+        + (sourcePreview ? '<span class="bf-chip bf-preview-badge">Website catalogue preview</span><br>' : "")
         + '<span class="bfc-imeta">Preview texture represents the recorded finish. It does not simulate the dried physical paint.</span><br>'
         + '<span class="bfc-imeta">Catalogue updated ' + esc(formatDate(DATA_UPDATED)) + "</span></span></div>"
         + '<div class="bfc-pills" role="group" aria-label="Target brand">' + pills.join("") + "</div>"
@@ -952,7 +960,7 @@
         + (global.navigator.share ? '<button type="button" class="bfc-share-button">Share</button>' : "")
         + '<span class="bfc-share-status" role="status" aria-live="polite"></span></div>'
         + '<div class="bfc-results">' + compatibleHtml + referenceHtml
-        + '<div class="bf-tease"><span>Found a useful shortlist? In the app, filter it by paints you own and keep the result with Your Palette, recipes, and projects.</span>'
+        + '<div class="bf-tease"><span>' + esc(appCopy) + '</span>'
         + '<span class="bfc-app-actions"><a href="' + esc(androidUrl) + '" rel="noopener" '
         + 'data-analytics-event="open_in_app" data-analytics-placement="converter_result" '
         + 'data-analytics-page-family="' + esc(analyticsPageFamily) + '" '
@@ -1004,7 +1012,11 @@
           detail: {
             resultCount: matches.length,
             sourceBrand: source.brand,
-            targetBrand: targetBrand
+            targetBrand: targetBrand,
+            cataloguePreview: source.status === "preview",
+            message: source.status === "preview"
+              ? "Explore BrushForge while this preview paint is prepared for the app catalogue."
+              : undefined
           }
         }));
       } catch (_error) {
