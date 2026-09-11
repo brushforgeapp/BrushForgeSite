@@ -1,0 +1,5 @@
+Contact: mailto:brushforgeapp@gmail.com
+Expires: 2027-09-11T23:59:59Z
+Preferred-Languages: en
+Canonical: https://brushforgeapp.com/.well-known/security.txt
+Policy: https://brushforgeapp.com/support.html
