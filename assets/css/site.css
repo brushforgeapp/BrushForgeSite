@@ -734,6 +734,18 @@ img {
   gap: 24px;
 }
 
+.footer-badges {
+  display: flex;
+  margin-top: 24px;
+}
+
+.peerpush-badge {
+  display: block;
+  width: 230px;
+  max-width: 100%;
+  border-radius: 12px;
+}
+
 /* FAQ */
 .faq {
   max-width: 800px;
@@ -814,6 +826,10 @@ img {
 
   .footer-links {
     flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .footer-badges {
     justify-content: center;
   }
 
