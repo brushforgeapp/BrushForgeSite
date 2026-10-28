@@ -675,15 +675,15 @@
     }
 
     const defaultMessages = {
-      homepage: 'Keep paints, recipes, and projects together.',
-      web_converter: 'Keep your paint matches with you at the painting desk.',
-      conversion_chart: 'Continue this paint comparison in BrushForge.',
+      homepage: 'Your paints, recipes and projects, all in BrushForge.',
+      web_converter: 'Find a match, save a recipe, plan your next miniature.',
+      conversion_chart: 'Check your paint rack. Keep the recipe for next time.',
       paint_detail: document.body.dataset.cataloguePreview === 'true'
-        ? 'Explore BrushForge while this paint is prepared for the app catalogue.'
-        : 'Keep this paint with your collection and projects.',
-      paint_hub: 'Take the paint catalogue to your painting desk.',
-      guide: 'Put this guide into practice with BrushForge.',
-      feature: 'Continue this workflow in BrushForge.',
+        ? 'Track paints and save recipes. This preview paint is not in the app yet.'
+        : 'Keep your paints, recipes and miniature projects together.',
+      paint_hub: 'Check what you own before buying another pot.',
+      guide: 'Keep your recipes handy for your next painting session.',
+      feature: 'Your paints, palettes, recipes and projects in one app.',
       methodology: 'Use catalogue matches in BrushForge.',
       press: 'Explore BrushForge on your device.',
       about: 'Try BrushForge at your painting desk.',

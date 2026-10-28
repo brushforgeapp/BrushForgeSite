@@ -942,10 +942,10 @@
         preview: " · website catalogue preview"
       }[source.status] || "";
       var sourcePreview = source.status === "preview";
-      var appLabel = sourcePreview ? "Explore BrushForge" : "Filter matches by paints you own";
+      var appLabel = "Get BrushForge";
       var appCopy = sourcePreview
-        ? "This paint is planned for the next BrushForge app catalogue update. You can compare it here now."
-        : "Found a useful shortlist? In the app, filter it by paints you own and keep the result with Your Palette, recipes, and projects.";
+        ? "You can compare this preview paint here, but it is not in the app yet. BrushForge also helps you track your paints, save recipes and organise projects."
+        : "Found a useful match? BrushForge helps you check the paints you own, save your colour recipes and keep track of your miniature projects.";
       panel.innerHTML = '<div class="bfc-source">' + swatchHtml(source.swatch, finishAppearance(source))
         + '<span><strong>' + esc(source.name) + "</strong>" + (source.code ? " · " + esc(source.code) : "")
         + '<br><span class="bfc-imeta">' + esc(disp(source.brand))
