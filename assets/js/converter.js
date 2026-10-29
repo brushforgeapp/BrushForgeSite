@@ -321,7 +321,7 @@
         }).then(function (raw) {
           var resultBrands = {};
           if (!raw || !hasOnlyKeys(raw, [
-            "version", "source", "matches", "references", "similar", "highlight", "shadow", "complements"
+            "version", "source", "matches", "references", "similar", "highlight", "shadow", "complements", "comparisonMode"
           ]) || raw.version !== manifest.version || !validateResultSource(raw.source)
               || raw.source.key !== publicKey || !Array.isArray(raw.matches) || !Array.isArray(raw.references)
               || !Array.isArray(raw.similar) || !Array.isArray(raw.complements)
@@ -344,6 +344,17 @@
               })
               || (raw.highlight !== null && raw.highlight !== undefined && !validateResultItem(raw.highlight))
               || (raw.shadow !== null && raw.shadow !== undefined && !validateResultItem(raw.shadow))) {
+            throw new Error("Paint result response has an unexpected format");
+          }
+          if (Object.prototype.hasOwnProperty.call(raw, "comparisonMode")
+              && (raw.comparisonMode !== "reviewed" || raw.source.status !== "reference_only"
+                || raw.source.behavior !== "opaque" || finishGroup(raw.source.finish) !== "standard"
+                || raw.matches.length !== 2 || raw.matches[0].key === raw.matches[1].key || raw.references.length || raw.similar.length
+                || raw.complements.length || raw.highlight !== null || raw.shadow !== null
+                || raw.matches.some(function (item) {
+                  return item.brand === raw.source.brand || item.key === raw.source.key
+                    || ["current", "legacy"].indexOf(item.status) < 0 || item.de > 5;
+                }))) {
             throw new Error("Paint result response has an unexpected format");
           }
           raw.highlight = raw.highlight || null;
@@ -909,10 +920,11 @@
     }
 
     function render() {
+      var reviewed = resultData.comparisonMode === "reviewed";
       var brands = allTargetBrands();
       var pills = ['<button type="button" class="bfc-pill' + (targetBrand === "ALL" ? " on" : "")
         + '" data-brand="ALL" aria-pressed="' + (targetBrand === "ALL" ? "true" : "false")
-        + '">One closest result per brand</button>'];
+        + '">' + (reviewed ? "All selected colours" : "One closest result per brand") + "</button>"];
       brands.forEach(function (brand) {
         pills.push('<button type="button" class="bfc-pill' + (targetBrand === brand ? " on" : "")
           + '" data-brand="' + esc(brand) + '" aria-pressed="'
@@ -925,9 +937,13 @@
       if (!matches.length) compatibleRows = '<div class="bfc-empty bfc-incompatible">No equivalent with '
         + "compatible paint behavior and finish group is available for "
         + esc(targetBrand === "ALL" ? "another included brand" : disp(targetBrand)) + ".</div>";
+      if (!matches.length && reviewed) compatibleRows = '<div class="bfc-empty">No selected colour from '
+        + esc(targetBrand === "ALL" ? "another brand" : disp(targetBrand)) + ' is included yet. Choose All selected colours to see the two available options.</div>';
       var compatibleHtml = '<section class="bfc-result-section" aria-labelledby="' + compatibleTitleId + '">'
         + '<h3 class="bfc-result-section-title" id="' + compatibleTitleId
-        + '">Closest matches with compatible behavior and finish group</h3>'
+        + '">' + (reviewed ? "Selected colours to try" : "Closest matches with compatible behavior and finish group") + '</h3>'
+        + (reviewed ? '<p class="bfc-reference-copy">These two colours are starting points for a test. Compare dry patches before using them on your model. '
+          + '<a href="' + esc(paintHref(source.path)) + '">See paint details and painting advice</a>.</p>' : "")
         + '<div class="bf-rows">' + compatibleRows + "</div></section>";
       var referenceHtml = references.length
         ? '<details class="bfc-reference-details"><summary>Color references with different paint behavior or finish group ('
@@ -941,6 +957,7 @@
         reference_only: " · reference-only range",
         preview: " · website catalogue preview"
       }[source.status] || "";
+      if (reviewed) sourceStatus = "";
       var sourcePreview = source.status === "preview";
       var appLabel = "Get BrushForge";
       var appCopy = sourcePreview
