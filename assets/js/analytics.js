@@ -28,6 +28,8 @@
     "platform",
     "placement",
     "page_family",
+    "source_family",
+    "campaign",
     "source_brand",
     "target_brand",
     "result_count",
@@ -250,6 +252,8 @@
       var key = entry[0];
       var value = entry[1];
       if (!ALLOWED_PROPS.has(key) || value === undefined || value === null) return;
+      if (key === "source_family" && !Object.prototype.hasOwnProperty.call(siteConfig.pageFamilyCampaigns || {}, value)) return;
+      if (key === "campaign" && !(siteConfig.campaignTaxonomy || []).includes(value)) return;
       if (typeof value === "number") {
         if (Number.isFinite(value)) output[key] = value;
         return;
@@ -428,6 +432,8 @@
       send(explicitName, {
         platform: target.dataset.analyticsPlatform,
         placement: target.dataset.analyticsPlacement,
+        source_family: target.dataset.analyticsSourceFamily,
+        campaign: target.dataset.analyticsCampaign,
         source_brand: target.dataset.analyticsSourceBrand,
         target_brand: target.dataset.analyticsTargetBrand,
         feature: target.dataset.analyticsFeature,

@@ -258,6 +258,10 @@
       if (linkPlatform !== preferredPlatform) return;
       link.classList.add('store-link-priority');
       link.closest('.store-card')?.classList.add('store-card-priority');
+      // Keep reading and keyboard order aligned with the visible store order.
+      if (link.parentElement?.matches('[data-download-options]')) {
+        link.parentElement.prepend(link);
+      }
     });
   }
 
@@ -413,6 +417,36 @@
     });
   }
 
+  function setupDownloadDestinations() {
+    if (pageFamilyFromPath(window.location.pathname) !== 'download') return;
+    const config = window.BRUSHFORGE_SITE_CONFIG || {};
+    const from = new URLSearchParams(window.location.search).get('from');
+    const sourceFamily = Object.prototype.hasOwnProperty.call(config.pageFamilyCampaigns || {}, from)
+      ? from : 'download';
+    const campaign = installCampaignForPageFamily(sourceFamily);
+
+    document.querySelectorAll('a[data-download-store]').forEach((link) => {
+      const platform = link.dataset.downloadStore;
+      const destination = storeDestination({
+        platform,
+        pageFamily: 'download',
+        campaign,
+        placement: link.dataset.analyticsPlacement,
+      });
+      if (!destination.isStore) return;
+      link.href = destination.href;
+      link.dataset.analyticsSourceFamily = sourceFamily;
+      link.dataset.analyticsCampaign = campaign;
+    });
+
+    document.querySelectorAll('img[data-download-qr]').forEach((img) => {
+      const platform = img.dataset.downloadQr;
+      if (!['android', 'ios'].includes(platform)) return;
+      const suffix = campaign === 'download' ? '' : `-${campaign}`;
+      img.src = `/assets/images/qr-${platform}-download${suffix}.svg`;
+    });
+  }
+
   function setupAnalyticsConsentUI() {
     let panel = null;
     let settingsTrigger = null;
@@ -460,7 +494,9 @@
         '<div class="bf-consent-panel-inner">',
         '<div class="bf-consent-copy">',
         '<h2 id="brushforge-consent-heading">Help improve BrushForge</h2>',
-        '<p>Allow basic website analytics so I can see which pages and tools are useful. Paint names, search text, collection data, photos and account details are never sent. <a href="/privacy.html">Privacy</a></p>',
+        window.location.pathname.startsWith('/download/')
+          ? '<p>Allow basic analytics to help me improve the site? Your paint searches and personal content stay out of analytics. <a href="/privacy.html">Privacy</a></p>'
+          : '<p>Allow basic website analytics so I can see which pages and tools are useful. Paint names, search text, collection data, photos and account details are never sent. <a href="/privacy.html">Privacy</a></p>',
         '</div>',
         '<div class="bf-consent-actions">',
         '<button type="button" data-analytics-consent="grant">Allow analytics</button>',
@@ -587,6 +623,8 @@
           platform: link.dataset.analyticsPlatform,
           placement: link.dataset.analyticsPlacement,
           page_family: link.dataset.analyticsPageFamily,
+          source_family: link.dataset.analyticsSourceFamily,
+          campaign: link.dataset.analyticsCampaign,
           source_brand: link.dataset.analyticsSourceBrand,
         });
         if (tracked) counted.add(link);
@@ -1199,6 +1237,7 @@
     setupMatchReports();
     setupChartAnchors();
     setupStoreRouting();
+    setupDownloadDestinations();
     setupStorePriority();
     document.addEventListener('brushforge:converter-result', () => {
       window.requestAnimationFrame(setupStorePriority);

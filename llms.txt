@@ -1,17 +1,20 @@
 # BrushForge
 
-> BrushForge is an independent miniature-paint converter and painting toolkit for Android and iOS.
+> BrushForge is an independent miniature painting toolkit for Android and iOS.
 > It helps painters compare recorded paint colors across brands, track paints they own, save recipes,
-> build palettes, and plan projects. Core app tools are offline-friendly. Verified August 4, 2026.
+> build palettes, and plan projects. Core app tools are offline-friendly.
 
 ## Key facts
 
 - Platforms: Android and iOS. The apps are free to start, contain optional in-app purchases, and may
   contain advertising.
-- App catalogue: 4,300+ paints and growing. Expanding coverage is the current main focus, including
-  direct collaboration with paint brands. The crawlable public website catalogue contains 2,941
-  selected records across opaque, metallic, wash, ink, glaze, single-coat, and other translucent
-  behaviour families; the counts describe different surfaces.
+- App catalogues: iOS version 1.4.1 lists 4,987 paints, including Reaper and Turbo Dork.
+  Google Play describes more than 4,000 paints on Android. These store claims were checked
+  October 30, 2026; they do not establish identical catalogue coverage on both platforms.
+- Website catalogue: 3,625 canonical detail pages, 3,417 searchable paints and 697 preview records.
+  These describe the public website, not app inventory limits. Preview records remain labelled
+  until their availability has been verified for the corresponding app release and platform.
+  Expanding coverage is the current main focus, including direct collaboration with paint brands.
 - Matching: stored sRGB/hex color values are converted to CIELAB and compared with CIEDE2000. Lower
   ΔE2000 means a closer recorded color value.
 - Limitations: a catalogue match is a shortlist, not proof that two physical paints are equivalent.
@@ -23,15 +26,16 @@
   are available on Android and iOS. Community is currently available on Android only.
 - Offline: the paint library, collection, recipes, palettes, and core tools are offline-friendly.
   Account services, purchases, Community, and connected photo suggestions require internet access.
-- Sync: data syncs automatically between devices on the same platform, with manual backup and restore
-  also available. Android and iOS do not have complete cross-platform sync, and manual transfers may
-  be incomplete.
+- Sync: same-platform sync and manual backup options are available; included features depend on
+  the plan shown in the app. Android and iOS do not have complete cross-platform sync, and manual
+  transfers may be incomplete. Purchases stay with their original store platform.
 - Web roadmap: public web accounts and app sync are a long-term goal without an announced release date.
 - Android plans: Free includes up to 40 paints, 5 recipes, and 1 project and contains ads. Premium
   removes ads and increases paint collection and project allowances. Exact paid allowances and local
   pricing are shown in the Android app and Google Play.
-- Import: current iOS releases support inventory CSV and selected paint-tracker imports plus supported
+- Import: iOS supports inventory CSV and selected paint-tracker imports plus supported
   BrushForge backup restoration. Import paths can differ by platform and release.
+- Requirements: iPhone and iPad require iOS or iPadOS 17.6 or later, as listed October 30, 2026.
 - Identity: BrushForge is built by Bastiaan Mahieu in Belgium. It is not affiliated with or endorsed
   by Games Workshop or any paint manufacturer.
 

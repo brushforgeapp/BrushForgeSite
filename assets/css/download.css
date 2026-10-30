@@ -1,0 +1,24 @@
+/* Download choices stay together before platform details and desktop QR codes. */
+.bf-download .bf-download-hero { margin: 20px 0 28px; }
+.bf-download-hero > div { width: 100%; }
+.bf-download-hero .sub { max-width: 58ch; margin: 12px 0 20px; }
+.bf-download-options { display: flex; flex-wrap: wrap; gap: 12px; }
+.bf-download-options .btn { min-height: 52px; justify-content: center; }
+.bf-download-note { margin: 14px 0 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.bf-download .bf-download-benefits { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.bf-download .bf-download-platforms { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.bf-download .pname { margin: 0; }
+.bf-download .pmeta { line-height: 1.6; }
+.bf-download-qr { margin: 24px 0 0; }
+.bf-download-qr img { display: block; width: 212px; height: 212px; max-width: 100%; background: #fff; border-radius: 8px; }
+.bf-download-qr figcaption { margin-top: 10px; color: var(--muted); font-size: 13px; }
+
+@media (max-width: 768px) {
+  .bf-download .bf-download-hero { margin: 12px 0 24px; }
+  .bf-download-options { flex-direction: column; gap: 10px; }
+  .bf-download-options .btn { width: 100%; padding: 12px 16px; font-size: 13px; }
+  .bf-download .bf-download-benefits,
+  .bf-download .bf-download-platforms { grid-template-columns: minmax(0, 1fr); }
+  .bf-download-qr { display: none; }
+  .bf-download-page .bf-consent-panel-inner { padding: 12px; gap: 8px; }
+}
