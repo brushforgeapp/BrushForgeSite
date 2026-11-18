@@ -1,0 +1,13 @@
+/* In-context app invitation: give the comparisons space, then offer the toolkit. */
+.bf-app-invitation { grid-column: 1 / -1; min-width: 0; margin: 6px 0; padding: 22px; border: 1px solid rgba(240,199,94,0.34); border-radius: var(--radius-lg, 16px); background: linear-gradient(135deg, rgba(240,199,94,0.10), rgba(240,199,94,0.02) 70%), var(--surface); }
+.bf-app-invitation h2, .bf-app-invitation h4 { margin: 0 0 10px; color: var(--text); font-family: var(--font-display, Georgia, serif); font-size: 23px; line-height: 1.25; }
+.bf-app-invitation p { margin: 0; max-width: 60ch; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.bf-app-invitation .bf-proof { margin: 12px 0 16px; }
+.bf-app-invitation-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; max-width: 600px; }
+.bf-app-invitation-actions > .btn { min-width: 0; min-height: 48px; white-space: normal; text-align: center; font-size: 12px; line-height: 1.4; }
+.bfc-results .bf-app-invitation { margin: 14px; }
+@media (max-width: 700px) {
+  .bf-app-invitation { padding: 18px; }
+  .bf-app-invitation-actions { grid-template-columns: minmax(0, 1fr); }
+  .bfc-results .bf-app-invitation { margin: 12px 8px; padding: 16px; }
+}

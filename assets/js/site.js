@@ -259,8 +259,13 @@
       link.classList.add('store-link-priority');
       link.closest('.store-card')?.classList.add('store-card-priority');
       // Keep reading and keyboard order aligned with the visible store order.
-      if (link.parentElement?.matches('[data-download-options]')) {
+      if (link.parentElement?.matches('[data-download-options], [data-invitation-options]')) {
         link.parentElement.prepend(link);
+      }
+      if (link.parentElement?.matches('[data-invitation-options]')) {
+        link.parentElement.querySelectorAll('a').forEach((option) => {
+          option.classList.toggle('primary', option === link);
+        });
       }
     });
   }

@@ -919,6 +919,27 @@
         + target.de.toFixed(1) + " · " + esc(tier[0]) + "</span></span></article>";
     }
 
+    function appInvitation() {
+      var copy = source.status === "preview"
+        ? "This preview paint is not in the app yet. You can still use BrushForge to track the paints you own, save recipes and organise your miniature projects."
+        : "Keep track of the paints you own, save recipes you want to use again and organise your next miniature project.";
+      var attributes = ' rel="noopener" data-analytics-event="app_store_click" '
+        + 'data-analytics-placement="converter_app_inline" '
+        + 'data-analytics-page-family="' + esc(analyticsPageFamily) + '" '
+        + 'data-analytics-source-brand="' + esc(source.brand) + '" '
+        + 'data-analytics-target-brand="' + esc(targetBrand === "ALL" ? "all" : targetBrand) + '" ';
+      return '<section class="bf-app-invitation" data-install-inline>'
+        + '<div class="bf-cta-kicker">Your painting toolkit</div>'
+        + '<h4>Your paints, recipes and projects, together.</h4><p>' + esc(copy) + '</p>'
+        + '<div class="bf-proof">Free to start · iOS and Android</div>'
+        + '<div class="bf-app-invitation-actions" data-invitation-options>'
+        + '<a class="btn primary" href="' + esc(androidUrl) + '"' + attributes
+        + 'data-analytics-platform="android">Get it on Google Play</a>'
+        + '<a class="btn" href="' + esc(iosUrl) + '"' + attributes
+        + 'data-analytics-platform="ios">Get it on the App Store</a>'
+        + '</div></section>';
+    }
+
     function render() {
       var reviewed = resultData.comparisonMode === "reviewed";
       var brands = allTargetBrands();
@@ -933,12 +954,15 @@
 
       var matches = computeMatches();
       var references = computeReferences();
-      var compatibleRows = matches.map(matchRow).join("");
+      var rows = matches.map(matchRow);
+      rows.splice(Math.min(3, rows.length), 0, appInvitation());
+      var compatibleRows = rows.join("");
       if (!matches.length) compatibleRows = '<div class="bfc-empty bfc-incompatible">No equivalent with '
         + "compatible paint behavior and finish group is available for "
         + esc(targetBrand === "ALL" ? "another included brand" : disp(targetBrand)) + ".</div>";
       if (!matches.length && reviewed) compatibleRows = '<div class="bfc-empty">No selected colour from '
         + esc(targetBrand === "ALL" ? "another brand" : disp(targetBrand)) + ' is included yet. Choose All selected colours to see the two available options.</div>';
+      if (!matches.length) compatibleRows += appInvitation();
       var compatibleHtml = '<section class="bfc-result-section" aria-labelledby="' + compatibleTitleId + '">'
         + '<h3 class="bfc-result-section-title" id="' + compatibleTitleId
         + '">' + (reviewed ? "Selected colours to try" : "Closest matches with compatible behavior and finish group") + '</h3>'
@@ -959,10 +983,6 @@
       }[source.status] || "";
       if (reviewed) sourceStatus = "";
       var sourcePreview = source.status === "preview";
-      var appLabel = "Get BrushForge";
-      var appCopy = sourcePreview
-        ? "You can compare this preview paint here, but it is not in the app yet. BrushForge also helps you track your paints, save recipes and organise projects."
-        : "Found a useful match? BrushForge helps you check the paints you own, save your colour recipes and keep track of your miniature projects.";
       panel.innerHTML = '<div class="bfc-source">' + swatchHtml(source.swatch, finishAppearance(source))
         + '<span><strong>' + esc(source.name) + "</strong>" + (source.code ? " · " + esc(source.code) : "")
         + '<br><span class="bfc-imeta">' + esc(disp(source.brand))
@@ -976,19 +996,7 @@
         + '<div class="bfc-share"><button type="button" class="bfc-copy">Copy link</button>'
         + (global.navigator.share ? '<button type="button" class="bfc-share-button">Share</button>' : "")
         + '<span class="bfc-share-status" role="status" aria-live="polite"></span></div>'
-        + '<div class="bfc-results">' + compatibleHtml + referenceHtml
-        + '<div class="bf-tease"><span>' + esc(appCopy) + '</span>'
-        + '<span class="bfc-app-actions"><a href="' + esc(androidUrl) + '" rel="noopener" '
-        + 'data-analytics-event="open_in_app" data-analytics-placement="converter_result" '
-        + 'data-analytics-page-family="' + esc(analyticsPageFamily) + '" '
-        + 'data-analytics-source-brand="' + esc(source.brand) + '" '
-        + 'data-analytics-target-brand="' + esc(targetBrand === "ALL" ? "all" : targetBrand) + '" '
-        + 'data-analytics-platform="android">' + esc(appLabel) + " on Android</a>"
-        + '<a href="' + esc(iosUrl) + '" rel="noopener" data-analytics-event="open_in_app" '
-        + 'data-analytics-placement="converter_result" data-analytics-page-family="' + esc(analyticsPageFamily) + '" '
-        + 'data-analytics-source-brand="' + esc(source.brand) + '" '
-        + 'data-analytics-target-brand="' + esc(targetBrand === "ALL" ? "all" : targetBrand) + '" '
-        + 'data-analytics-platform="ios">' + esc(appLabel) + " on iOS</a></span></div></div>";
+        + '<div class="bfc-results">' + compatibleHtml + referenceHtml + '</div>';
       panel.hidden = false;
 
       panel.querySelectorAll(".bfc-pill").forEach(function (button) {
