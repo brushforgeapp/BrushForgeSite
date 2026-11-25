@@ -105,8 +105,35 @@
   }
 
   function searchBucket(value) {
-    var compact = normalizeSearch(value).replace(/\s/g, "");
-    return compact.length >= 2 ? compact.slice(0, 2) : "";
+    // Every indexed word contributes its two-character prefix. Anchor on a
+    // complete search word, never on characters joined across word boundaries.
+    var word = normalizeSearch(value).split(" ").find(function (token) {
+      return token.length >= 2;
+    });
+    return word ? word.slice(0, 2) : "";
+  }
+
+  function searchScore(paint, value) {
+    var query = normalizeSearch(value);
+    if (!query) return -1;
+    var name = normalizeSearch(paint.name);
+    var code = normalizeSearch(paint.code);
+    var range = normalizeSearch(paint.range || paint.line);
+    var brand = normalizeSearch(paint.brand + " " + disp(paint.brand));
+    var fields = name + " " + code + " " + range + " " + brand;
+    var words = fields.split(" ");
+    // All search words must match, but they can appear in different fields
+    // and in any order. Prefixes support searches while someone is typing.
+    var matches = query.split(" ").every(function (token) {
+      return words.some(function (word) { return word.indexOf(token) === 0; });
+    });
+    if (!matches) return -1;
+    if (name === query) return 0;
+    if (name.indexOf(query) === 0) return 1;
+    if (name.split(" ").some(function (word) { return word.indexOf(query) === 0; })) return 2;
+    if (code.indexOf(query) === 0) return 3;
+    if (fields.indexOf(query) >= 0) return 4;
+    return 5;
   }
 
   function finishGroup(finish) {
@@ -285,7 +312,7 @@
 
     function loadSearch(value, force) {
       var bucket = searchBucket(value);
-      if (!bucket) return Promise.reject(new Error("Search needs at least two letters or numbers"));
+      if (!bucket) return Promise.reject(new Error("Search needs a word with at least two letters or numbers"));
       if (force) {
         return loadManifest(true).then(function () { return loadSearch(value, false); });
       }
@@ -402,6 +429,7 @@
     deScale: deScale,
     normalizeSearch: normalizeSearch,
     searchBucket: searchBucket,
+    searchScore: searchScore,
     finishGroup: finishGroup,
     compatibleForMatching: compatibleForMatching,
     isQuantizedSwatch: isQuantizedSwatch,
@@ -774,19 +802,6 @@
       }
     });
 
-    function searchScore(paint, query) {
-      var name = normalizeSearch(paint.name);
-      var code = normalizeSearch(paint.code);
-      var range = normalizeSearch(rangeOf(paint));
-      var brand = normalizeSearch(paint.brand + " " + disp(paint.brand));
-      if (name === query) return 0;
-      if (name.indexOf(query) === 0) return 1;
-      if (name.split(" ").some(function (word) { return word.indexOf(query) === 0; })) return 2;
-      if (code.indexOf(query) === 0) return 3;
-      if ((name + " " + code + " " + range + " " + brand).indexOf(query) >= 0) return 4;
-      return -1;
-    }
-
     function search(query, generation, force) {
       setBusy(true);
       setStatus("Searching paint catalogue…");
@@ -820,7 +835,7 @@
       if (!searchBucket(query)) {
         setBusy(false);
         closeDrop();
-        if (query.length) setStatus("Type at least two characters to search.");
+        if (query.length) setStatus("Use at least two letters or numbers in one search word.");
         else setStatus("");
         return;
       }
