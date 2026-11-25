@@ -136,6 +136,31 @@
     return 5;
   }
 
+  function rangeOf(paint) {
+    return String((paint && (paint.range || paint.line)) || "").trim();
+  }
+
+  function searchFilterOptions(paints) {
+    var ranges = Object.create(null);
+    var finishes = Object.create(null);
+    paints.forEach(function (paint) {
+      if (rangeOf(paint)) ranges[rangeOf(paint)] = true;
+      finishes[PUBLIC_APPEARANCES[paint.appearance] ? paint.appearance : "unknown"] = true;
+    });
+    return {
+      ranges: Object.keys(ranges).sort(function (a, b) { return a.localeCompare(b); }),
+      finishes: Object.keys(PUBLIC_APPEARANCES).filter(function (finish) { return finishes[finish]; })
+    };
+  }
+
+  function filterSearchHits(paints, filters) {
+    return paints.filter(function (paint) {
+      var finish = PUBLIC_APPEARANCES[paint.appearance] ? paint.appearance : "unknown";
+      return (!filters.range || rangeOf(paint) === filters.range)
+        && (!filters.finish || finish === filters.finish);
+    });
+  }
+
   function finishGroup(finish) {
     var normalized = String(finish || "unknown").trim().toLowerCase()
       .replace(/[\s_-]+/g, " ");
@@ -430,6 +455,8 @@
     normalizeSearch: normalizeSearch,
     searchBucket: searchBucket,
     searchScore: searchScore,
+    searchFilterOptions: searchFilterOptions,
+    filterSearchHits: filterSearchHits,
     finishGroup: finishGroup,
     compatibleForMatching: compatibleForMatching,
     isQuantizedSwatch: isQuantizedSwatch,
@@ -584,6 +611,8 @@
     var targetBrand = presetTarget ? disp(presetTarget) : "ALL";
     var dropItems = [];
     var searchHits = [];
+    var unfilteredHits = [];
+    var searchFilters = { range: "", finish: "" };
     var shownHits = 0;
     var searchPageSize = 30;
     var activeIndex = -1;
@@ -602,6 +631,22 @@
 
     // Keep actions outside the listbox so keyboard users can reach them directly.
     var searchPopup = element("div", "bfc-search-popup", "");
+    var filterBar = element("div", "bfc-search-filters", "");
+    var rangeLabel = element("label", "bfc-filter-label", "Range");
+    var finishLabel = element("label", "bfc-filter-label", "Finish");
+    var rangeSelect = element("select", "bfc-range-filter", "");
+    var finishSelect = element("select", "bfc-finish-filter", "");
+    var clearFilters = element("button", "bfc-clear-filters", "Clear filters");
+    clearFilters.type = "button";
+    clearFilters.hidden = true;
+    rangeSelect.id = "bfc-range-" + componentCount;
+    finishSelect.id = "bfc-finish-" + componentCount;
+    rangeLabel.htmlFor = rangeSelect.id;
+    finishLabel.htmlFor = finishSelect.id;
+    rangeLabel.appendChild(rangeSelect);
+    finishLabel.appendChild(finishSelect);
+    filterBar.appendChild(rangeLabel);
+    filterBar.appendChild(finishLabel);
     var searchSummary = element("div", "bfc-search-summary", "");
     var searchActions = element("div", "bfc-search-actions", "");
     var showMore = element("button", "bfc-show-more", "Show more");
@@ -611,9 +656,11 @@
     browsePaints.href = "/paints/";
     searchPopup.hidden = true;
     drop.parentNode.insertBefore(searchPopup, drop);
+    searchPopup.appendChild(filterBar);
     searchPopup.appendChild(searchSummary);
     searchPopup.appendChild(drop);
     searchActions.appendChild(showMore);
+    searchActions.appendChild(clearFilters);
     searchActions.appendChild(browsePaints);
     searchPopup.appendChild(searchActions);
 
@@ -625,10 +672,6 @@
     function setBusy(busy) {
       if (busy) input.setAttribute("aria-busy", "true");
       else input.removeAttribute("aria-busy");
-    }
-
-    function rangeOf(paint) {
-      return String((paint && (paint.range || paint.line)) || "");
     }
 
     function statusBadge(paint) {
@@ -676,6 +719,7 @@
       drop.innerHTML = "";
       dropItems = [];
       searchHits = [];
+      unfilteredHits = [];
       shownHits = 0;
       activeIndex = -1;
       input.setAttribute("aria-expanded", "false");
@@ -693,9 +737,10 @@
       var current = dropItems[activeIndex];
       input.setAttribute("aria-activedescendant", current.id);
       var rowBounds = current.getBoundingClientRect();
-      var listBounds = drop.getBoundingClientRect();
-      if (rowBounds.top < listBounds.top) drop.scrollTop += rowBounds.top - listBounds.top;
-      else if (rowBounds.bottom > listBounds.bottom) drop.scrollTop += rowBounds.bottom - listBounds.bottom;
+      var scrollTarget = searchPopup.classList.contains("is-compact") ? searchPopup : drop;
+      var listBounds = scrollTarget.getBoundingClientRect();
+      if (rowBounds.top < listBounds.top) scrollTarget.scrollTop += rowBounds.top - listBounds.top;
+      else if (rowBounds.bottom > listBounds.bottom) scrollTarget.scrollTop += rowBounds.bottom - listBounds.bottom;
     }
 
     function fitSearchPopup() {
@@ -706,9 +751,11 @@
       var bounds = input.getBoundingClientRect();
       var below = bottom - bounds.bottom - 16;
       var above = bounds.top - top - 88; // Leave room for the site navigation.
-      var openAbove = below < 230 && above > below;
+      var openAbove = below < 330 && above > below;
+      var availableHeight = Math.max(160, Math.min(480, openAbove ? above : below));
       searchPopup.classList.toggle("is-above", openAbove);
-      searchPopup.style.maxHeight = Math.max(160, Math.min(480, openAbove ? above : below)) + "px";
+      searchPopup.classList.toggle("is-compact", availableHeight < 300);
+      searchPopup.style.maxHeight = availableHeight + "px";
     }
 
     global.addEventListener("resize", fitSearchPopup);
@@ -718,6 +765,29 @@
       global.visualViewport.addEventListener("scroll", fitSearchPopup, { passive: true });
     }
 
+    function updateSearchFilters(hits) {
+      unfilteredHits = hits;
+      var options = searchFilterOptions(hits);
+      if (options.ranges.indexOf(searchFilters.range) < 0) searchFilters.range = "";
+      if (options.finishes.indexOf(searchFilters.finish) < 0) searchFilters.finish = "";
+      rangeSelect.innerHTML = '<option value="">All ranges</option>' + options.ranges.map(function (range) {
+        return '<option value="' + esc(range) + '">' + esc(range) + '</option>';
+      }).join("");
+      finishSelect.innerHTML = '<option value="">All finishes</option>' + options.finishes.map(function (finish) {
+        var label = finish === "unknown" ? "Not listed" : appearanceLabel(finish).replace(/ finish$/, "");
+        return '<option value="' + finish + '">' + esc(label) + '</option>';
+      }).join("");
+      rangeSelect.value = searchFilters.range;
+      finishSelect.value = searchFilters.finish;
+      rangeSelect.disabled = !options.ranges.length;
+      finishSelect.disabled = !options.finishes.length;
+      filterBar.hidden = !hits.length;
+    }
+
+    function renderFilteredSearch() {
+      renderDrop(filterSearchHits(unfilteredHits, searchFilters), input.value.trim());
+    }
+
     function renderDrop(hits, query) {
       drop.innerHTML = "";
       dropItems = [];
@@ -725,18 +795,23 @@
       shownHits = 0;
       activeIndex = -1;
       input.setAttribute("aria-activedescendant", "");
-      var singleBrand = hits.length && hits.every(function (paint) {
-        return sameBrand(paint.brand, hits[0].brand);
+      var browseHits = hits.length ? hits : unfilteredHits;
+      var singleBrand = browseHits.length && browseHits.every(function (paint) {
+        return sameBrand(paint.brand, browseHits[0].brand);
       });
-      browsePaints.textContent = singleBrand ? "Browse " + disp(hits[0].brand) + " paints" : "Browse all paints";
-      browsePaints.href = singleBrand ? "/paints/" + brandSlugFromPath(hits[0].path) + "/" : "/paints/";
+      browsePaints.textContent = singleBrand ? "Browse " + disp(browseHits[0].brand) + " paints" : "Browse all paints";
+      browsePaints.href = singleBrand ? "/paints/" + brandSlugFromPath(browseHits[0].path) + "/" : "/paints/";
+      clearFilters.hidden = !searchFilters.range && !searchFilters.finish;
       searchPopup.hidden = false;
       drop.hidden = false;
       fitSearchPopup();
       drop.scrollTop = 0;
+      searchPopup.scrollTop = 0;
       input.setAttribute("aria-expanded", "true");
       if (!hits.length) {
-        var empty = element("div", "bfc-empty", "No paints found for “" + esc(query) + "”.");
+        var empty = element("div", "bfc-empty", unfilteredHits.length
+          ? "No paints match these filters. Try another range or finish, or clear filters."
+          : "No paints found for “" + esc(query) + "”.");
         empty.setAttribute("role", "option");
         empty.setAttribute("aria-disabled", "true");
         drop.appendChild(empty);
@@ -785,6 +860,23 @@
       appendSearchPage();
       if (shownHits > firstNew) setActive(firstNew);
     });
+    rangeSelect.addEventListener("change", function () {
+      searchFilters.range = rangeSelect.value;
+      renderFilteredSearch();
+    });
+    finishSelect.addEventListener("change", function () {
+      searchFilters.finish = finishSelect.value;
+      renderFilteredSearch();
+    });
+    clearFilters.addEventListener("click", function () {
+      searchFilters.range = "";
+      searchFilters.finish = "";
+      rangeSelect.value = "";
+      finishSelect.value = "";
+      // Focus a control that stays visible after the reset button disappears.
+      input.focus({ preventScroll: true });
+      renderFilteredSearch();
+    });
     searchPopup.addEventListener("keydown", function (event) {
       if (event.key === "Escape") {
         event.preventDefault();
@@ -818,7 +910,8 @@
           return a.score - b.score || a.paint.name.localeCompare(b.paint.name)
             || a.paint.brand.localeCompare(b.paint.brand) || a.paint.path.localeCompare(b.paint.path);
         });
-        renderDrop(hits.map(function (hit) { return hit.paint; }), input.value.trim());
+        updateSearchFilters(hits.map(function (hit) { return hit.paint; }));
+        renderFilteredSearch();
       }).catch(function () {
         if (generation !== searchGeneration) return;
         setBusy(false);
@@ -872,7 +965,9 @@
         searchGeneration += 1;
         if (!event.shiftKey && !searchPopup.hidden) {
           event.preventDefault();
-          (showMore.hidden ? browsePaints : showMore).focus();
+          (!filterBar.hidden && !rangeSelect.disabled ? rangeSelect
+            : (!filterBar.hidden && !finishSelect.disabled ? finishSelect
+              : (showMore.hidden ? browsePaints : showMore))).focus();
           return;
         }
         closeDrop();
@@ -1179,6 +1274,8 @@
       source = null;
       resultData = null;
       input.value = paint.name;
+      searchFilters.range = "";
+      searchFilters.finish = "";
       closeDrop();
       if (!fromUrl) updateAddressBar(paint);
       panel.hidden = true;
