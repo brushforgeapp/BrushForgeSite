@@ -895,7 +895,7 @@
             + "Treat it as a shortlist reference and test dried physical swatches.</p>"
           : "");
       var previewTarget = target.status === "preview"
-        ? '<span class="bf-chip bf-preview-badge">Coming in the next app catalogue update</span>'
+        ? '<span class="bf-chip bf-preview-badge">Preview paint</span>'
         : "";
       return '<article class="bf-row bfc-result">'
         + '<span class="bf-swatch-pair" aria-hidden="true"><span style="background-color:'
@@ -921,7 +921,7 @@
 
     function appInvitation() {
       var copy = source.status === "preview"
-        ? "This preview paint is not in the app yet. You can still use BrushForge to track the paints you own, save recipes and organise your miniature projects."
+        ? "Track the paints you own, save recipes and organise your miniature projects in BrushForge."
         : "Keep track of the paints you own, save recipes you want to use again and organise your next miniature project.";
       var attributes = ' rel="noopener" data-analytics-event="app_store_click" '
         + 'data-analytics-placement="converter_app_inline" '

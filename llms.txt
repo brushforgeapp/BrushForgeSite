@@ -8,10 +8,9 @@
 
 - Platforms: Android and iOS. The apps are free to start, contain optional in-app purchases, and may
   contain advertising.
-- App catalogues: iOS version 1.4.1 lists 4,987 paints, including Reaper and Turbo Dork.
-  Google Play describes more than 4,000 paints on Android. These store claims were checked
-  October 30, 2026; they do not establish identical catalogue coverage on both platforms.
-- Website catalogue: 3,625 canonical detail pages, 3,417 searchable paints and 697 preview records.
+- App catalogue: 5,000+ paints, as confirmed by the owner on November 25, 2026.
+  Individual ranges and feature availability can differ between Android and iOS.
+- Website catalogue: 3,630 canonical detail pages, 3,422 searchable paints and 702 preview records.
   These describe the public website, not app inventory limits. Preview records remain labelled
   until their availability has been verified for the corresponding app release and platform.
   Expanding coverage is the current main focus, including direct collaboration with paint brands.

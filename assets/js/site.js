@@ -722,7 +722,7 @@
       web_converter: 'Find a match, save a recipe, plan your next miniature.',
       conversion_chart: 'Check your paint rack. Keep the recipe for next time.',
       paint_detail: document.body.dataset.cataloguePreview === 'true'
-        ? 'Track paints and save recipes. This preview paint is not in the app yet.'
+        ? 'Track your paints, save recipes and organise your projects.'
         : 'Keep your paints, recipes and miniature projects together.',
       paint_hub: 'Check what you own before buying another pot.',
       guide: 'Keep your recipes handy for your next painting session.',
@@ -1108,7 +1108,7 @@
       engage(null, {
         placement: 'converter_result',
         message: detail.cataloguePreview
-          ? 'Explore BrushForge while this preview paint is prepared for the app catalogue.'
+          ? 'Explore the full painting toolkit in BrushForge.'
           : 'Keep this paint match with you at the painting desk.',
         ...detail,
       });
